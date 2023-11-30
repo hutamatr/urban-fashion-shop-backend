@@ -2,8 +2,9 @@ import { DataTypes } from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
-/* The code `const Product = sequelize.define(...)` is defining a Sequelize model for a "product" table
-in a database. */
+/** The code `const Product = sequelize.define(...)` is defining a Sequelize model for a
+ * "product" table in a database.
+ **/
 const Product = sequelize.define(
   'product',
   {

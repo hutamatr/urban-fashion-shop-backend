@@ -2,8 +2,9 @@ import fs from 'fs';
 import morgan from 'morgan';
 import path from 'path';
 
-/* The code `const accessLogStream = fs.createWriteStream(path.join(__dirname, '..', '..', 'logs',
-'access.log'), { flags: 'a' });` is creating a write stream to a log file named "access.log". */
+/** The code `const accessLogStream = fs.createWriteStream(path.join(__dirname, '..', '..', 'logs',
+ * 'access.log'), { flags: 'a' });` is creating a write stream to a log file named "access.log".
+ **/
 const accessLogStream = fs.createWriteStream(
   path.join(__dirname, '..', '..', 'logs', 'access.log'),
   { flags: 'a' }

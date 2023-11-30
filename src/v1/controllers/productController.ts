@@ -8,8 +8,6 @@ interface RequestParams {
   productId: string;
 }
 
-// interface ResponseBody {}
-
 interface RequestBody {
   title: string;
   description: string;
@@ -25,14 +23,6 @@ interface RequestQuery {
 /**
  * The function `getProducts` retrieves a list of products with pagination support and returns the
  * products, total count, skip value, and limit value in the response.
- * @param req - The `req` parameter is an object representing the HTTP request. It contains information
- * such as the request method, headers, query parameters, and body.
- * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
- * response back to the client. It is responsible for setting the status code, headers, and sending the
- * response body.
- * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
- * next middleware function in the request-response cycle. It is typically used to handle errors or to
- * move on to the next middleware function in the chain.
  */
 export async function getProducts(
   req: Request<object, object, object, RequestQuery>,
@@ -69,17 +59,7 @@ export async function getProducts(
 }
 
 /**
- * The function `getProduct` retrieves a product from the database based on the provided product ID and
- * returns it as a JSON response, or throws an error if the product is not found.
- * @param req - The `req` parameter is an object that represents the HTTP request made to the server.
- * It contains information such as the request method, headers, query parameters, request body, and
- * route parameters.
- * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
- * response back to the client. It is responsible for setting the status code, headers, and sending the
- * response body.
- * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
- * next middleware function in the request-response cycle. It is typically used to handle errors or to
- * move on to the next middleware function in the chain.
+ * The function `getProduct` retrieves a product from the database based on the provided product ID * and returns it as a JSON response, or throws an error if the product is not found.
  */
 export async function getProduct(
   req: Request<RequestParams, object, object, object>,
@@ -107,17 +87,9 @@ export async function getProduct(
 }
 
 /**
- * The function `postProduct` is an asynchronous function that handles the creation of a new product by
- * extracting the necessary data from the request body, creating a new product using the extracted
- * data, and sending a response with the created product if successful.
- * @param req - The `req` parameter is an object representing the HTTP request made to the server. It
- * contains information such as the request headers, request body, request method, and request URL.
- * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
- * response back to the client. It is responsible for setting the status code, headers, and sending the
- * response body.
- * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
- * next middleware function in the request-response cycle. It is typically used to handle errors or to
- * move on to the next middleware function after completing the current one.
+ * The function `postProduct` is an asynchronous function that handles the creation of a
+ * new product by extracting the necessary data from the request body, creating a new product using
+ * the extracted data, and sending a response with the created product if successful.
  */
 export async function postProduct(
   req: Request<object, object, RequestBody, object>,
@@ -156,18 +128,9 @@ export async function postProduct(
 /**
  * The function `updateProduct` updates a product in a database based on the provided request
  * parameters and body, and returns a response with the updated product.
- * @param req - The `req` parameter is an object that represents the HTTP request made to the server.
- * It contains information such as the request method, request headers, request parameters, and request
- * body.
- * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
- * response back to the client. It is responsible for setting the status code, headers, and sending the
- * response body.
- * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
- * next middleware function in the request-response cycle. It is typically used to handle errors or to
- * move on to the next middleware function in the chain.
  */
 export async function updateProduct(
-  req: Request<RequestParams, object, RequestBody, object>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
@@ -218,16 +181,6 @@ export async function updateProduct(
 /**
  * The `deleteProduct` function is an asynchronous function that deletes a product from the database
  * and returns a success message if the deletion is successful.
- * @param req - The `req` parameter is an object that represents the HTTP request made to the server.
- * It contains information such as the request method, request headers, request parameters, and request
- * body.
- * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
- * response back to the client. It contains methods and properties for setting the response status
- * code, headers, and body. In this code, `res.status(200)` is used to set the response status code to
- * 200
- * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
- * next middleware function in the request-response cycle. It is typically used to handle errors or to
- * move on to the next middleware function after completing the current one.
  */
 export async function deleteProduct(
   req: Request<RequestParams, object, RequestBody, object>,
