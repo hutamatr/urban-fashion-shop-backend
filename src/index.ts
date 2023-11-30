@@ -1,6 +1,7 @@
 import 'dotenv/config';
 
 import bodyParser from 'body-parser';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import helmet from 'helmet';
@@ -9,7 +10,7 @@ import { sequelize } from './database/db';
 import errorMiddleware from './middleware/error';
 import corsMiddleware, { host, port } from './utils/cors';
 import logger from './utils/logger';
-import limiter from './utils/rate-limiter';
+import limiter from './utils/rateLimiter';
 import productRoutes from './v1/routes/productRoutes';
 
 const app = express();
@@ -17,6 +18,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(corsMiddleware());
 app.use(cookieParser());
+app.use(compression());
 app.use(helmet());
 app.use(logger());
 app.use(limiter);

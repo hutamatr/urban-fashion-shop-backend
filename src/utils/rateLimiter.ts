@@ -1,8 +1,9 @@
 import { rateLimit } from 'express-rate-limit';
 
-/* The code is creating a rate limiter middleware using the `express-rate-limit` package. The rate
-limiter limits the number of requests that can be made from a single IP address within a specified
-time window. */
+/** The code is creating a rate limiter middleware using the `express-rate-limit` package. The rate
+ * limiter limits the number of requests that can be made from a single IP address
+ * within a specified time window.
+ **/
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
   limit: 20, // Limit each IP to 20 requests per `window` (here, per 5 minutes).
