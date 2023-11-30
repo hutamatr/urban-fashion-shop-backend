@@ -8,20 +8,21 @@
   "engines": {
     "node": ">= 18"
   },
+
   "scripts": {
-    "dev": "nodemon ./build/index.js",
-    "dev:ts": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "start": "node ./build/index.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon build/index.js\"",
+    "start": "node build/index.js",
     "build": "rm -rf build/ && tsc --build",
-    "lint": "eslint ./src",
+    "lint": "eslint src",
     "lint:fix": "eslint src --fix && yarn format",
-    "format": "prettier --write ./src",
-    "format:check": "prettier -c ./src",
+    "format": "prettier --write src",
+    "format:check": "prettier -c src",
     "typechecks": "tsc --noEmit --incremental false"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
+    "concurrently": "^8.2.2",
     "eslint": "^8.54.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
@@ -32,16 +33,20 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
+    "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^20.10.0",
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
     "mysql2": "^3.6.5",
     "sequelize": "^6.35.1",
     "zod": "^3.22.4",

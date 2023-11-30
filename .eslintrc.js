@@ -9,13 +9,14 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
   ],
+  parser: '@typescript-eslint/parser',
   rules: {
     'no-unused-vars': [1, { args: 'after-used', argsIgnorePattern: '^_' }],
     'no-console': 'warn',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
 
     //#region  //*=========== Unused Import ===========
-    '@typescript-eslint/no-unused-vars': 'on',
+    '@typescript-eslint/no-unused-vars': 0,
     'unused-imports/no-unused-imports': 'warn',
     'unused-imports/no-unused-vars': [
       'warn',
@@ -50,7 +51,7 @@ module.exports = {
           ['^@routes', '^@api'],
 
           // utils
-          ['^@utils', '^@db'],
+          ['^@utils', '^@database'],
 
           // Other imports
           ['^@public'],
@@ -73,17 +74,17 @@ module.exports = {
       },
     ],
   },
-  overrides: [
-    {
-      env: {
-        node: true,
-      },
-      files: ['.eslintrc.{js,cjs}'],
-      parserOptions: {
-        sourceType: 'script',
-      },
-    },
-  ],
+  // overrides: [
+  //   {
+  //     env: {
+  //       node: true,
+  //     },
+  //     files: ['.eslintrc.{js,cjs}'],
+  //     parserOptions: {
+  //       sourceType: 'script',
+  //     },
+  //   },
+  // ],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
