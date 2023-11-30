@@ -7,6 +7,8 @@ import {
   postProduct,
   updateProduct,
 } from '../controllers/productController';
+import { productValidation } from '../../validations/productValidation';
+import { validate } from '../../validations/validation';
 
 const router = Router();
 
@@ -14,9 +16,9 @@ router.get('/', getProducts);
 
 router.get('/:productId', getProduct);
 
-router.post('/', postProduct);
+router.post('/', validate(productValidation), postProduct);
 
-router.put('/:productId', updateProduct);
+router.put('/:productId', validate(productValidation), updateProduct);
 
 router.delete('/:productId', deleteProduct);
 
