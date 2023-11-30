@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import Product from '../models/productModel';
 import { IError } from '../../middleware/error';
-import errorHandler from '../../utils/error-handler';
+import errorHandler from '../../utils/errorHandler';
 
 interface RequestParams {
   productId: string;
