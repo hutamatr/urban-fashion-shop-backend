@@ -7,8 +7,8 @@ import {
   postProduct,
   updateProduct,
 } from '../controllers/productController';
+import { validate } from '../../middleware/validation';
 import { productValidation } from '../../validations/productValidation';
-import { validate } from '../../validations/validation';
 
 const router = Router();
 
