@@ -11,6 +11,9 @@ import errorMiddleware from './middleware/error';
 import corsMiddleware, { host, port } from './utils/cors';
 import logger from './utils/logger';
 import limiter from './utils/rateLimiter';
+import Category from './v1/models/categoryModel';
+import Product from './v1/models/productModel';
+import categoryRoutes from './v1/routes/categoryRoutes';
 import productRoutes from './v1/routes/productRoutes';
 
 const app = express();
@@ -24,6 +27,7 @@ app.use(logger());
 app.use(limiter);
 
 app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/categories', categoryRoutes);
 
 app.all('*', (req, res) => {
   const statusCode = 404;
@@ -36,6 +40,9 @@ app.all('*', (req, res) => {
 });
 
 app.use(errorMiddleware);
+
+Category.hasMany(Product, { foreignKey: 'category_id' });
+Product.belongsTo(Category, { foreignKey: 'category_id' });
 
 sequelize
   .sync()
