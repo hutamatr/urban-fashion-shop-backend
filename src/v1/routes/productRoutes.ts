@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
 import {
+  createProduct,
   deleteProduct,
   getProduct,
   getProducts,
-  postProduct,
   updateProduct,
 } from '../controllers/productController';
 import { validate } from '../../middleware/validation';
@@ -16,7 +16,7 @@ router.get('/', getProducts);
 
 router.get('/:productId', getProduct);
 
-router.post('/', validate(productValidation), postProduct);
+router.post('/', validate(productValidation), createProduct);
 
 router.put('/:productId', validate(productValidation), updateProduct);
 
