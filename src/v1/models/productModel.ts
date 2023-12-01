@@ -6,7 +6,7 @@ import { sequelize } from '../../database/db';
  * "product" table in a database.
  **/
 const Product = sequelize.define(
-  'product',
+  'Product',
   {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -30,9 +30,15 @@ const Product = sequelize.define(
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
+    category_id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      references: {
+        model: 'Categories',
+        key: 'id',
+      },
+    },
   },
   {
-    timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',

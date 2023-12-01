@@ -5,7 +5,7 @@ import { sequelize } from '../../database/db';
 /**
  * The code is defining a Sequelize model called "User" with the specified attributes and options. **/
 const User = sequelize.define(
-  'user',
+  'User',
   {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -32,7 +32,6 @@ const User = sequelize.define(
     },
   },
   {
-    timestamps: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   }

@@ -1,21 +1,23 @@
 import { NextFunction, Request, Response } from 'express';
 
+import Category from '../models/categoryModel';
 import Product from '../models/productModel';
 import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
 
-interface RequestParams {
+interface IRequestParams {
   productId: string;
 }
 
-interface RequestBody {
+interface IRequestBody {
   title: string;
   description: string;
   price: number;
   quantity: number;
+  category_id: number;
 }
 
-interface RequestQuery {
+interface IRequestQuery {
   limit: string;
   skip: string;
 }
@@ -25,7 +27,7 @@ interface RequestQuery {
  * products, total count, skip value, and limit value in the response.
  */
 export async function getProducts(
-  req: Request<object, object, object, RequestQuery>,
+  req: Request<object, object, object, IRequestQuery>,
   res: Response,
   next: NextFunction
 ) {
@@ -62,7 +64,7 @@ export async function getProducts(
  * The function `getProduct` retrieves a product from the database based on the provided product ID * and returns it as a JSON response, or throws an error if the product is not found.
  */
 export async function getProduct(
-  req: Request<RequestParams, object, object, object>,
+  req: Request<IRequestParams, object, object, object>,
   res: Response,
   next: NextFunction
 ) {
@@ -91,8 +93,8 @@ export async function getProduct(
  * new product by extracting the necessary data from the request body, creating a new product using
  * the extracted data, and sending a response with the created product if successful.
  */
-export async function postProduct(
-  req: Request<object, object, RequestBody, object>,
+export async function createProduct(
+  req: Request<object, object, IRequestBody, object>,
   res: Response,
   next: NextFunction
 ) {
@@ -101,12 +103,24 @@ export async function postProduct(
     const description = req.body.description;
     const price = req.body.price;
     const quantity = req.body.quantity;
+    const categoryId = req.body.category_id;
+
+    const findCategory = await Category.findOne({ where: { id: categoryId } });
+
+    if (!findCategory) {
+      const error: IError = new Error(
+        'Failed to post product, category not found!'
+      );
+      error.statusCode = 422;
+      throw error;
+    }
 
     const createdProduct = await Product.create({
       title,
       description,
       price,
       quantity,
+      category_id: findCategory.dataValues.id,
     });
 
     if (!createdProduct) {
@@ -183,7 +197,7 @@ export async function updateProduct(
  * and returns a success message if the deletion is successful.
  */
 export async function deleteProduct(
-  req: Request<RequestParams, object, RequestBody, object>,
+  req: Request<IRequestParams, object, object, object>,
   res: Response,
   next: NextFunction
 ) {
