@@ -13,6 +13,7 @@ import logger from './utils/logger';
 import limiter from './utils/rateLimiter';
 import Category from './v1/models/categoryModel';
 import Product from './v1/models/productModel';
+import authRoutes from './v1/routes/authRoutes';
 import categoryRoutes from './v1/routes/categoryRoutes';
 import productRoutes from './v1/routes/productRoutes';
 
@@ -28,6 +29,7 @@ app.use(limiter);
 
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1', authRoutes);
 
 app.all('*', (req, res) => {
   const statusCode = 404;
