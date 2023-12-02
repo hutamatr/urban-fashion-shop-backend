@@ -1,6 +1,9 @@
 import { z as zod } from 'zod';
 
-/* The code is defining a validation schema using the Zod library for a product object. */
+/** The code is defining a validation schema using the Zod library for a category object.
+ * The validation schema specifies that the category object should have a property called
+ * "body", which should be an object itself. Inside the "body" object, there should be a
+ * property called "name", which should be a string. **/
 export const categoryValidation = zod.object({
   body: zod.object({
     name: zod

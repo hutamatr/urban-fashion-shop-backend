@@ -12,6 +12,19 @@ interface IRequestBody {
   name: string;
 }
 
+/**
+ * The function `getCategories` retrieves a list of categories and sends it as a JSON response,
+ * handling any errors that occur.
+ * @param {Request} _req - The `_req` parameter is of type `Request` and represents the HTTP request
+ * object. It contains information about the incoming request such as headers, query parameters, and
+ * request body.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status
+ * code, headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function in the chain.
+ */
 export async function getCategories(
   _req: Request,
   res: Response,
@@ -33,6 +46,19 @@ export async function getCategories(
   }
 }
 
+/**
+ * The function `getCategory` retrieves a category based on the provided category ID and sends it as a
+ * JSON response, or throws an error if the category is not found.
+ * @param req - The `req` parameter is an object that represents the HTTP request made to the server.
+ * It contains information such as the request method, headers, query parameters, request body, and
+ * route parameters.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status
+ * code, headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function in the chain.
+ */
 export async function getCategory(
   req: Request<IRequestParams, object, object, object>,
   res: Response,
@@ -59,6 +85,18 @@ export async function getCategory(
   }
 }
 
+/**
+ * The function `createCategory` creates a new category with the provided name and returns a success
+ * message along with the created category data, or throws an error if the category creation fails.
+ * @param req - The `req` parameter is an object representing the HTTP request made to the server. It
+ * contains information such as the request method, headers, query parameters, and body.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status
+ * code, headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function in the chain.
+ */
 export async function createCategory(
   req: Request<object, object, IRequestBody, object>,
   res: Response,
@@ -87,6 +125,19 @@ export async function createCategory(
   }
 }
 
+/**
+ * The function `updateCategory` updates a category's name and last updated timestamp in a database and
+ * returns a success message with the updated category.
+ * @param {Request} req - The `req` parameter is the request object that contains information about the
+ * HTTP request made by the client. It includes properties such as the request headers, request body,
+ * request method, request URL, etc.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status,
+ * headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function after completing the current one.
+ */
 export async function updateCategory(
   req: Request,
   res: Response,
@@ -132,6 +183,19 @@ export async function updateCategory(
   }
 }
 
+/**
+ * The function `deleteCategory` is an asynchronous function that deletes a category based on the
+ * provided category ID and returns a success message if the deletion is successful.
+ * @param req - The `req` parameter is an object that represents the HTTP request made to the server.
+ * It contains information such as the request method, request headers, request body, and request
+ * parameters.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status
+ * code, headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function after completing the current one.
+ */
 export async function deleteCategory(
   req: Request<IRequestParams, object, object, object>,
   res: Response,
