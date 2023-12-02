@@ -34,7 +34,7 @@ export async function getProducts(
   try {
     const limit = +req.query.limit;
     const skip = +req.query.skip || 0;
-    let products: unknown[];
+    let products;
 
     if (limit > 0 && skip > 0) {
       products = await Product.findAll({
