@@ -1,10 +1,25 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, ModelDefined, Optional } from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
+interface IUser {
+  id: number;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+type UserCreationAttributes = Optional<
+  IUser,
+  'id' | 'first_name' | 'last_name' | 'created_at' | 'updated_at'
+>;
+
 /**
  * The code is defining a Sequelize model called "User" with the specified attributes and options. **/
-const User = sequelize.define(
+const User: ModelDefined<IUser, UserCreationAttributes> = sequelize.define(
   'User',
   {
     id: {
