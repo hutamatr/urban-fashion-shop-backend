@@ -7,7 +7,9 @@ interface IProduct {
   title: string;
   description: string;
   price: number;
-  quantity: number;
+  discount_percentage: number;
+  discounted_price: number;
+  stock_quantity: number;
   category_id: number;
   created_at: string;
   updated_at: string;
@@ -24,7 +26,7 @@ type ProductCreationAttributes = Optional<
  **/
 const Product: ModelDefined<IProduct, ProductCreationAttributes> =
   sequelize.define(
-    'Product',
+    'product',
     {
       id: {
         type: DataTypes.INTEGER.UNSIGNED,
@@ -44,14 +46,24 @@ const Product: ModelDefined<IProduct, ProductCreationAttributes> =
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
       },
-      quantity: {
+      discount_percentage: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      discounted_price: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      stock_quantity: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
       },
       category_id: {
         type: DataTypes.INTEGER.UNSIGNED,
         references: {
-          model: 'Categories',
+          model: 'categories',
           key: 'id',
         },
       },
@@ -60,6 +72,7 @@ const Product: ModelDefined<IProduct, ProductCreationAttributes> =
       createdAt: 'created_at',
       updatedAt: 'updated_at',
       deletedAt: 'deleted_at',
+      underscored: true,
       paranoid: true,
     }
   );

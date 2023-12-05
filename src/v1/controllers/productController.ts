@@ -14,6 +14,7 @@ interface IRequestBody {
   description: string;
   price: number;
   quantity: number;
+  discount_percentage: number;
   category_id: number;
 }
 
@@ -102,7 +103,8 @@ export async function createProduct(
     const title = req.body.title;
     const description = req.body.description;
     const price = req.body.price;
-    const quantity = req.body.quantity;
+    const stockQuantity = req.body.quantity;
+    const discountPercentage = req.body.discount_percentage;
     const categoryId = req.body.category_id;
 
     const findCategory = await Category.findOne({ where: { id: categoryId } });
@@ -115,11 +117,15 @@ export async function createProduct(
       throw error;
     }
 
+    const discountedPrice = price - price * (discountPercentage / 100);
+
     const createdProduct = await Product.create({
       title,
       description,
       price,
-      quantity,
+      discount_percentage: discountPercentage,
+      discounted_price: discountedPrice,
+      stock_quantity: stockQuantity,
       category_id: findCategory.dataValues.id,
     });
 
@@ -153,7 +159,8 @@ export async function updateProduct(
     const title = req.body.title;
     const description = req.body.description;
     const price = req.body.price;
-    const quantity = req.body.quantity;
+    const discountPercentage = req.body.discount_percentage;
+    const stockQuantity = req.body.quantity;
     const updatedAt = new Date().toISOString();
 
     const product = await Product.findOne({ where: { id: productId } });
@@ -166,11 +173,15 @@ export async function updateProduct(
       throw error;
     }
 
+    const discountedPrice = price - price * (discountPercentage / 100);
+
     product.set({
       title,
       description,
       price,
-      quantity,
+      discount_percentage: discountPercentage,
+      discounted_price: discountedPrice,
+      stock_quantity: stockQuantity,
       updated_at: updatedAt,
     });
 
@@ -197,7 +208,7 @@ export async function updateProduct(
  * and returns a success message if the deletion is successful.
  */
 export async function deleteProduct(
-  req: Request<IRequestParams, object, object, object>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {

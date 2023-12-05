@@ -7,6 +7,7 @@ import {
   getProducts,
   updateProduct,
 } from '../controllers/productController';
+import { authMiddleware } from '../../middleware/auth';
 import { validate } from '../../middleware/validation';
 import { productValidation } from '../../validations/productValidation';
 
@@ -16,10 +17,15 @@ router.get('/', getProducts);
 
 router.get('/:productId', getProduct);
 
-router.post('/', validate(productValidation), createProduct);
+router.post('/', authMiddleware, validate(productValidation), createProduct);
 
-router.put('/:productId', validate(productValidation), updateProduct);
+router.put(
+  '/:productId',
+  authMiddleware,
+  validate(productValidation),
+  updateProduct
+);
 
-router.delete('/:productId', deleteProduct);
+router.delete('/:productId', authMiddleware, deleteProduct);
 
 export default router;
