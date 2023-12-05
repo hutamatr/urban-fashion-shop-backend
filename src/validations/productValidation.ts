@@ -34,6 +34,20 @@ export const productValidation = zod.object({
         message: 'Price cannot be negative',
       })
       .min(1, { message: 'Price must be greater than 0' }),
+    discount_percentage: zod
+      .number({
+        required_error: 'Discount percentage is required',
+        invalid_type_error: 'Discount percentage must be a number',
+      })
+      .nonnegative({
+        message: 'Discount percentage cannot be negative',
+      })
+      .min(0, {
+        message: 'Discount percentage must be greater than or equal to 0',
+      })
+      .max(100, {
+        message: 'Discount percentage must be less than 100',
+      }),
     quantity: zod
       .number({
         required_error: 'Quantity is required',

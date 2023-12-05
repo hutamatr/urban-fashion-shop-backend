@@ -4,21 +4,20 @@ import { sequelize } from '../../database/db';
 
 interface ICategory {
   id: number;
-  name: string;
+  category_name: string;
   created_at: string;
   updated_at: string;
-  deleted_at: string;
 }
 
 type CategoryCreationAttributes = Optional<
   ICategory,
-  'id' | 'created_at' | 'updated_at' | 'deleted_at'
+  'id' | 'created_at' | 'updated_at'
 >;
 
 /* The code is defining a Sequelize model for a category entity. */
 const Category: ModelDefined<ICategory, CategoryCreationAttributes> =
   sequelize.define(
-    'Category',
+    'category',
     {
       id: {
         type: DataTypes.INTEGER.UNSIGNED,
@@ -26,15 +25,16 @@ const Category: ModelDefined<ICategory, CategoryCreationAttributes> =
         primaryKey: true,
         autoIncrement: true,
       },
-      name: {
+      category_name: {
         type: DataTypes.STRING(255),
         allowNull: false,
+        unique: true,
       },
     },
     {
+      underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      deletedAt: 'deleted_at',
     }
   );
 

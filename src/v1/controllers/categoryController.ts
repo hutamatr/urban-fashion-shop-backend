@@ -4,10 +4,6 @@ import Category from '../models/categoryModel';
 import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
 
-interface IRequestParams {
-  categoryId: string;
-}
-
 interface IRequestBody {
   name: string;
 }
@@ -60,7 +56,7 @@ export async function getCategories(
  * move on to the next middleware function in the chain.
  */
 export async function getCategory(
-  req: Request<IRequestParams, object, object, object>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
@@ -106,7 +102,7 @@ export async function createCategory(
     const categoryName = req.body.name;
 
     const createdCategory = await Category.create({
-      name: categoryName,
+      category_name: categoryName,
     });
 
     if (!createdCategory) {
@@ -146,7 +142,6 @@ export async function updateCategory(
   try {
     const categoryName = req.body.name;
     const categoryId = req.params.categoryId;
-    const updatedAt = new Date().toISOString();
 
     const category = await Category.findOne({
       where: { id: categoryId },
@@ -161,8 +156,7 @@ export async function updateCategory(
     }
 
     category.set({
-      name: categoryName,
-      updated_at: updatedAt,
+      category_name: categoryName,
     });
 
     const updatedCategory = await category.save();
@@ -197,7 +191,7 @@ export async function updateCategory(
  * move on to the next middleware function after completing the current one.
  */
 export async function deleteCategory(
-  req: Request<IRequestParams, object, object, object>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {

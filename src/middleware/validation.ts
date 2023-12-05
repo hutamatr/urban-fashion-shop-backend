@@ -4,6 +4,7 @@ import {
   signInValidation,
   signUpValidation,
 } from '../validations/authValidation';
+import { cartValidation } from '../validations/cartValidation';
 import { categoryValidation } from '../validations/categoryValidation';
 import { productValidation } from '../validations/productValidation';
 
@@ -22,6 +23,7 @@ export const validate =
       | typeof productValidation
       | typeof signUpValidation
       | typeof signInValidation
+      | typeof cartValidation
       | typeof categoryValidation
   ) =>
   async (req: Request, _res: Response, next: NextFunction) => {

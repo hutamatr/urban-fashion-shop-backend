@@ -47,7 +47,7 @@ export function generateToken(
 export function verifyToken(
   token: string,
   tokenSecret: string
-): Promise<string | jwt.JwtPayload | undefined> {
+): Promise<jwt.JwtPayload> {
   return new Promise((resolve, reject) => {
     jwt.verify(token, tokenSecret, (error, decoded) => {
       if (error) {
@@ -55,7 +55,7 @@ export function verifyToken(
         return;
       }
 
-      resolve(decoded);
+      resolve(decoded as jwt.JwtPayload);
     });
   });
 }

@@ -7,19 +7,25 @@ import {
   getCategory,
   updateCategory,
 } from '../controllers/categoryController';
+import { authMiddleware } from '../../middleware/auth';
 import { validate } from '../../middleware/validation';
 import { categoryValidation } from '../../validations/categoryValidation';
 
 const router = Router();
 
-router.get('/', getCategories);
+router.get('/', authMiddleware, getCategories);
 
-router.get('/:categoryId', getCategory);
+router.get('/:categoryId', authMiddleware, getCategory);
 
-router.post('/', validate(categoryValidation), createCategory);
+router.post('/', authMiddleware, validate(categoryValidation), createCategory);
 
-router.put('/:categoryId', validate(categoryValidation), updateCategory);
+router.put(
+  '/:categoryId',
+  authMiddleware,
+  validate(categoryValidation),
+  updateCategory
+);
 
-router.delete('/:categoryId', deleteCategory);
+router.delete('/:categoryId', authMiddleware, deleteCategory);
 
 export default router;

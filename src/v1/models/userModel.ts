@@ -2,17 +2,18 @@ import { DataTypes, ModelDefined, Optional } from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
-interface IUser {
+export interface IUser {
   id: number;
   email: string;
   password: string;
   first_name: string;
+  role_id: number;
   last_name: string;
   created_at: string;
   updated_at: string;
 }
 
-type UserCreationAttributes = Optional<
+export type UserCreationAttributes = Optional<
   IUser,
   'id' | 'first_name' | 'last_name' | 'created_at' | 'updated_at'
 >;
@@ -20,7 +21,7 @@ type UserCreationAttributes = Optional<
 /**
  * The code is defining a Sequelize model called "User" with the specified attributes and options. **/
 const User: ModelDefined<IUser, UserCreationAttributes> = sequelize.define(
-  'User',
+  'user',
   {
     id: {
       type: DataTypes.INTEGER.UNSIGNED,
@@ -45,8 +46,16 @@ const User: ModelDefined<IUser, UserCreationAttributes> = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    role_id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      references: {
+        model: 'roles',
+        key: 'id',
+      },
+    },
   },
   {
+    underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
   }
