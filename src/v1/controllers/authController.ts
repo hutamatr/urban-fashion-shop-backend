@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
+import Role from '../models/roleModel';
 import User from '../models/userModel';
 import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
@@ -34,7 +35,7 @@ interface IRequestBody {
  * move on to the next middleware function after completing the current one.
  */
 export async function signUpHandler(
-  req: Request<object, object, IRequestBody, object>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
@@ -51,9 +52,14 @@ export async function signUpHandler(
 
     const hashedPassword = await hashPassword(password);
 
+    const getRoles = await Role.findOne({ where: { $role_name$: 'user' } });
+
+    const defaultRoleId = getRoles?.dataValues?.id;
+
     const createdUser = await User.create({
       email,
       password: hashedPassword,
+      role_id: defaultRoleId as number,
     });
 
     if (!createdUser) {
@@ -70,13 +76,13 @@ export async function signUpHandler(
     } = createdUser.dataValues;
 
     const accessToken = await generateToken(
-      { id, userEmail },
+      { id, email: userEmail },
       accessTokenSecret as string,
-      '5m'
+      '1d'
     );
 
     const refreshToken = await generateToken(
-      { id, userEmail },
+      { id, email: userEmail },
       refreshTokenSecret as string,
       '7d'
     );
@@ -151,7 +157,7 @@ export async function signInHandler(
     const accessToken = await generateToken(
       { id, email: userEmail },
       accessTokenSecret as string,
-      '5m'
+      '1d'
     );
 
     const refreshToken = await generateToken(
