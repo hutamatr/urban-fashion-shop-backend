@@ -1,10 +1,10 @@
 import 'dotenv/config';
 
-import bodyParser from 'body-parser';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
+import multer from 'multer';
 
 import { sequelize } from './database/db';
 import errorMiddleware, { IError } from './middleware/error';
@@ -18,15 +18,22 @@ import Category from './v1/models/categoryModel';
 import Product from './v1/models/productModel';
 import Role from './v1/models/roleModel';
 import User from './v1/models/userModel';
+import Wishlist from './v1/models/wishlistModel';
 import authRoutes from './v1/routes/authRoutes';
 import cartRoutes from './v1/routes/cartRoutes';
 import categoryRoutes from './v1/routes/categoryRoutes';
 import productRoutes from './v1/routes/productRoutes';
+import refreshRoutes from './v1/routes/refreshRoutes';
 import roleRoutes from './v1/routes/roleRoutes';
+import wishlistRoutes from './v1/routes/wishlistRoutes';
 
 const app = express();
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(upload.single('image'));
 app.use(corsMiddleware());
 app.use(cookieParser());
 app.use(compression());
@@ -35,10 +42,12 @@ app.use(logger());
 app.use(limiter);
 
 app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/wishlists', wishlistRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/carts', cartRoutes);
 app.use('/api/v1/roles', roleRoutes);
 app.use('/api/v1', authRoutes);
+app.use('/api/v1/refresh', refreshRoutes);
 
 app.all('*', (_req: Request, _res: Response, next: NextFunction) => {
   try {
@@ -68,6 +77,14 @@ Cart.belongsToMany(Product, { through: CartItem, foreignKey: 'cart_id' });
 // Role & User Associations
 Role.hasOne(User, { foreignKey: 'role_id' });
 User.belongsTo(Role, { foreignKey: 'role_id' });
+
+// WIshlist & User Associations
+User.hasMany(Wishlist, { foreignKey: 'user_id' });
+Wishlist.belongsTo(User, { foreignKey: 'user_id' });
+
+// WIshlist & Product Associations
+Product.hasMany(Wishlist, { foreignKey: 'product_id' });
+Wishlist.belongsTo(Product, { foreignKey: 'product_id' });
 
 sequelize
   // .sync({ force: true })
