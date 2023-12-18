@@ -4,6 +4,7 @@ import Category from '../models/categoryModel';
 import Product from '../models/productModel';
 import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
+import { imageUpload } from '../../utils/imageUpload';
 
 interface IRequestParams {
   productId: string;
@@ -41,9 +42,22 @@ export async function getProducts(
       products = await Product.findAll({
         offset: skip,
         limit: limit,
+        include: [
+          {
+            model: Category,
+            attributes: ['id', 'category_name'],
+          },
+        ],
       });
     } else {
-      products = await Product.findAll();
+      products = await Product.findAll({
+        include: [
+          {
+            model: Category,
+            attributes: ['id', 'category_name'],
+          },
+        ],
+      });
     }
 
     if (!products) {
@@ -106,6 +120,12 @@ export async function createProduct(
     const stockQuantity = req.body.quantity;
     const discountPercentage = req.body.discount_percentage;
     const categoryId = req.body.category_id;
+    const file = req.file;
+
+    const { downloadURL } = await imageUpload(
+      file as Express.Multer.File,
+      'products/'
+    );
 
     const findCategory = await Category.findOne({ where: { id: categoryId } });
 
@@ -123,6 +143,7 @@ export async function createProduct(
       title,
       description,
       price,
+      image_url: downloadURL,
       discount_percentage: discountPercentage,
       discounted_price: discountedPrice,
       stock_quantity: stockQuantity,
