@@ -38,6 +38,7 @@ export async function getCart(req: Request, res: Response, next: NextFunction) {
             'id',
             'title',
             'description',
+            'image_url',
             'price',
             'discount_percentage',
             'discounted_price',

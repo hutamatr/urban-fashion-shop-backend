@@ -6,8 +6,10 @@ import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
 import { comparePassword, hashPassword } from '../../utils/hash';
 import {
+  accessTokenExpiresIn,
   accessTokenSecret,
   generateToken,
+  refreshTokenExpiredIn,
   refreshTokenSecret,
 } from '../../utils/jwt';
 
@@ -78,19 +80,19 @@ export async function signUpHandler(
     const accessToken = await generateToken(
       { id, email: userEmail },
       accessTokenSecret as string,
-      '1d'
+      accessTokenExpiresIn
     );
 
     const refreshToken = await generateToken(
       { id, email: userEmail },
       refreshTokenSecret as string,
-      '7d'
+      refreshTokenExpiredIn
     );
 
     res.cookie('rt', refreshToken, {
       httpOnly: true,
       sameSite: 'strict',
-      secure: true,
+      secure: false,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -157,19 +159,19 @@ export async function signInHandler(
     const accessToken = await generateToken(
       { id, email: userEmail },
       accessTokenSecret as string,
-      '1d'
+      accessTokenExpiresIn
     );
 
     const refreshToken = await generateToken(
       { id, email: userEmail },
       refreshTokenSecret as string,
-      '7d'
+      refreshTokenExpiredIn
     );
 
     res.cookie('rt', refreshToken, {
       httpOnly: true,
       sameSite: 'strict',
-      secure: true,
+      secure: false,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -220,7 +222,7 @@ export async function signOutHandler(
     res.clearCookie('rt', {
       httpOnly: true,
       sameSite: 'strict',
-      secure: true,
+      secure: false,
     });
 
     res.status(200).json({ sign_out: true, message: 'Signout successfully' });
