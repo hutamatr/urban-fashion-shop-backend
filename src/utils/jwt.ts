@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken';
 
 export const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 export const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
+export const accessTokenExpiresIn = process.env.ACCESS_TOKEN_EXPIRED;
+export const refreshTokenExpiredIn = process.env.REFRESH_TOKEN_EXPIRED;
 
 /**
  * The function generates a token using the provided payload, token secret, and expiration time.
@@ -19,7 +21,7 @@ export const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 export function generateToken(
   payload: string | object | Buffer,
   tokenSecret: string,
-  expiresIn: string = '5m'
+  expiresIn: string = accessTokenExpiresIn as string
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     jwt.sign(payload, tokenSecret, { expiresIn }, (error, token) => {

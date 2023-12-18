@@ -7,6 +7,7 @@ interface IProduct {
   title: string;
   description: string;
   price: number;
+  image_url: string;
   discount_percentage: number;
   discounted_price: number;
   stock_quantity: number;
@@ -58,6 +59,10 @@ const Product: ModelDefined<IProduct, ProductCreationAttributes> =
       },
       stock_quantity: {
         type: DataTypes.INTEGER.UNSIGNED,
+        allowNull: false,
+      },
+      image_url: {
+        type: DataTypes.STRING(255),
         allowNull: false,
       },
       category_id: {

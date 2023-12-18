@@ -13,9 +13,9 @@ import { categoryValidation } from '../../validations/categoryValidation';
 
 const router = Router();
 
-router.get('/', authMiddleware, getCategories);
+router.get('/', getCategories);
 
-router.get('/:categoryId', authMiddleware, getCategory);
+router.get('/:categoryId', getCategory);
 
 router.post('/', authMiddleware, validate(categoryValidation), createCategory);
 

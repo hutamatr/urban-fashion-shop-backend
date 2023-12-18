@@ -17,7 +17,13 @@ router.get('/', getProducts);
 
 router.get('/:productId', getProduct);
 
-router.post('/', authMiddleware, validate(productValidation), createProduct);
+router.post(
+  '/',
+  authMiddleware,
+  validate(productValidation),
+
+  createProduct
+);
 
 router.put(
   '/:productId',
