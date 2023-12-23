@@ -27,6 +27,7 @@ const Role: ModelDefined<IRole, RoleCreationAttributes> = sequelize.define(
     role_name: {
       type: DataTypes.STRING(255),
       allowNull: false,
+      unique: true,
     },
   },
   {
