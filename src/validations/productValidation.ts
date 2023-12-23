@@ -28,13 +28,13 @@ export const productValidation = zod.object({
     price: zod
       .string({
         required_error: 'Price is required',
-        invalid_type_error: 'Price must be a number',
+        invalid_type_error: 'Price must be a string',
       })
       .min(1, { message: 'Price must be greater than 0' }),
     discount_percentage: zod
       .string({
         required_error: 'Discount percentage is required',
-        invalid_type_error: 'Discount percentage must be a number',
+        invalid_type_error: 'Discount percentage must be a string',
       })
       .min(0, {
         message: 'Discount percentage must be greater than or equal to 0',
@@ -42,10 +42,10 @@ export const productValidation = zod.object({
       .max(100, {
         message: 'Discount percentage must be less than 100',
       }),
-    quantity: zod
+    stock_quantity: zod
       .string({
         required_error: 'Quantity is required',
-        invalid_type_error: 'Quantity must be a number',
+        invalid_type_error: 'Quantity must be a string',
       })
       .min(1, { message: 'Quantity must be greater than 0' }),
   }),

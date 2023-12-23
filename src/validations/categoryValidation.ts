@@ -6,7 +6,7 @@ import { z as zod } from 'zod';
  * property called "name", which should be a string. **/
 export const categoryValidation = zod.object({
   body: zod.object({
-    name: zod
+    category_name: zod
       .string({
         required_error: 'Category name is required',
         invalid_type_error: 'Category name must be a string',
