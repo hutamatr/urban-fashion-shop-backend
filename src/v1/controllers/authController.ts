@@ -36,7 +36,7 @@ interface IRequestBody {
  * next middleware function in the request-response cycle. It is typically used to handle errors or to
  * move on to the next middleware function after completing the current one.
  */
-export async function signUpHandler(
+export async function signUpUserHandler(
   req: Request,
   res: Response,
   next: NextFunction
@@ -53,15 +53,22 @@ export async function signUpHandler(
     }
 
     const hashedPassword = await hashPassword(password);
+    let roleId;
 
-    const getRoles = await Role.findOne({ where: { $role_name$: 'user' } });
+    const getRole = await Role.findOne({ where: { role_name: 'user' } });
+    roleId = getRole?.dataValues?.id;
 
-    const defaultRoleId = getRoles?.dataValues?.id;
+    if (!getRole) {
+      const newRole = await Role.create({ role_name: 'user' });
+      roleId = newRole?.dataValues.id;
+    }
+
+    const userRoleId = roleId;
 
     const createdUser = await User.create({
       email,
       password: hashedPassword,
-      role_id: defaultRoleId as number,
+      role_id: userRoleId as number,
     });
 
     if (!createdUser) {
@@ -124,7 +131,7 @@ export async function signUpHandler(
  * next middleware function in the request-response cycle. It is typically used to handle errors or to
  * move on to the next middleware function after completing the current one.
  */
-export async function signInHandler(
+export async function signInUserHandler(
   req: Request<object, object, IRequestBody, object>,
   res: Response,
   next: NextFunction
