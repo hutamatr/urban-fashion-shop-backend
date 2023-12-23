@@ -1,9 +1,13 @@
 import { Router } from 'express';
 
 import {
-  signInHandler,
+  signInAdminHandler,
+  signUpAdminHandler,
+} from '../controllers/authAdminController';
+import {
+  signInUserHandler,
   signOutHandler,
-  signUpHandler,
+  signUpUserHandler,
 } from '../controllers/authController';
 import { validate } from '../../middleware/validation';
 import {
@@ -13,10 +17,14 @@ import {
 
 const router = Router();
 
-router.post('/signup', validate(signUpValidation), signUpHandler);
+router.post('/signup', validate(signUpValidation), signUpUserHandler);
 
-router.post('/signin', validate(signInValidation), signInHandler);
+router.post('/signin', validate(signInValidation), signInUserHandler);
 
 router.post('/signout', signOutHandler);
+
+router.post('/admin/signup', validate(signUpValidation), signUpAdminHandler);
+
+router.post('/admin/signin', validate(signInValidation), signInAdminHandler);
 
 export default router;
