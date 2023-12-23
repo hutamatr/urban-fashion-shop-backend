@@ -48,7 +48,7 @@ export async function createRole(
 
     res.status(201).json({
       message: 'Create role successfully!',
-      product: createdRole.dataValues,
+      role: createdRole.dataValues,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
