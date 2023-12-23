@@ -33,7 +33,7 @@ const upload = multer({ storage: storage });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(upload.single('image'));
+app.use(upload.single('image_url'));
 app.use(corsMiddleware());
 app.use(cookieParser());
 app.use(compression());
