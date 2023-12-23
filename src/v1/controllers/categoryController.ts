@@ -5,7 +5,7 @@ import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
 
 interface IRequestBody {
-  name: string;
+  category_name: string;
 }
 
 /**
@@ -99,7 +99,7 @@ export async function createCategory(
   next: NextFunction
 ) {
   try {
-    const categoryName = req.body.name;
+    const categoryName = req.body.category_name;
 
     const createdCategory = await Category.create({
       category_name: categoryName,
