@@ -2,9 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 
 import Category from '../models/categoryModel';
 import Product from '../models/productModel';
+import {
+  deleteImageFromStorage,
+  imageUpload,
+} from '../../database/firebaseStorage';
 import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
-import { imageUpload } from '../../utils/imageUpload';
 
 interface IRequestParams {
   productId: string;
@@ -14,7 +17,7 @@ interface IRequestBody {
   title: string;
   description: string;
   price: number;
-  quantity: number;
+  stock_quantity: number;
   discount_percentage: number;
   category_id: number;
 }
@@ -117,7 +120,7 @@ export async function createProduct(
     const title = req.body.title;
     const description = req.body.description;
     const price = req.body.price;
-    const stockQuantity = req.body.quantity;
+    const stockQuantity = req.body.stock_quantity;
     const discountPercentage = req.body.discount_percentage;
     const categoryId = req.body.category_id;
     const file = req.file;
@@ -181,7 +184,7 @@ export async function updateProduct(
     const description = req.body.description;
     const price = req.body.price;
     const discountPercentage = req.body.discount_percentage;
-    const stockQuantity = req.body.quantity;
+    const stockQuantity = req.body.stock_quantity;
     const updatedAt = new Date().toISOString();
 
     const product = await Product.findOne({ where: { id: productId } });
@@ -235,6 +238,13 @@ export async function deleteProduct(
 ) {
   try {
     const productId = req.params.productId;
+
+    const product = await Product.findOne({ where: { id: productId } });
+
+    await deleteImageFromStorage(
+      product?.dataValues.image_url as string,
+      'products/'
+    );
 
     const deletedProduct = await Product.destroy({ where: { id: productId } });
 
