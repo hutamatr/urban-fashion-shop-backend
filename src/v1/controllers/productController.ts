@@ -6,7 +6,6 @@ import {
   deleteImageFromStorage,
   imageUpload,
 } from '../../database/firebaseStorage';
-import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
 
 interface IRequestParams {
@@ -16,10 +15,10 @@ interface IRequestParams {
 interface IRequestBody {
   title: string;
   description: string;
-  price: number;
-  stock_quantity: number;
-  discount_percentage: number;
-  category_id: number;
+  price: string;
+  stock_quantity: string;
+  discount_percentage: string;
+  category_id: string;
 }
 
 interface IRequestQuery {
@@ -41,7 +40,7 @@ export async function getProducts(
     const skip = +req.query.skip || 0;
     let products;
 
-    if (limit > 0 && skip > 0) {
+    if (limit > 0 && skip >= 0) {
       products = await Product.findAll({
         offset: skip,
         limit: limit,
@@ -119,16 +118,24 @@ export async function createProduct(
   try {
     const title = req.body.title;
     const description = req.body.description;
-    const price = req.body.price;
-    const stockQuantity = req.body.stock_quantity;
-    const discountPercentage = req.body.discount_percentage;
-    const categoryId = req.body.category_id;
+    const price = Number(req.body.price);
+    const stockQuantity = Number(req.body.stock_quantity);
+    const discountPercentage = Number(req.body.discount_percentage);
+    const categoryId = Number(req.body.category_id);
     const file = req.file;
+    const isAdmin = req.isAdmin;
 
-    const { downloadURL } = await imageUpload(
-      file as Express.Multer.File,
-      'products/'
-    );
+    if (!isAdmin) {
+      const error: IError = new Error('Not authorized!');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    if (!file) {
+      const error: IError = new Error('Image is required!');
+      error.statusCode = 422;
+      throw error;
+    }
 
     const findCategory = await Category.findOne({ where: { id: categoryId } });
 
@@ -141,6 +148,8 @@ export async function createProduct(
     }
 
     const discountedPrice = price - price * (discountPercentage / 100);
+
+    const { downloadURL } = await imageUpload(file, 'products/');
 
     const createdProduct = await Product.create({
       title,
@@ -182,10 +191,18 @@ export async function updateProduct(
     const productId = req.params.productId;
     const title = req.body.title;
     const description = req.body.description;
-    const price = req.body.price;
-    const discountPercentage = req.body.discount_percentage;
-    const stockQuantity = req.body.stock_quantity;
+    const price = Number(req.body.price);
+    const discountPercentage = Number(req.body.discount_percentage);
+    const stockQuantity = Number(req.body.stock_quantity);
+    const file = req.file;
     const updatedAt = new Date().toISOString();
+    const isAdmin = req.isAdmin;
+
+    if (!isAdmin) {
+      const error: IError = new Error('Not authorized!');
+      error.statusCode = 401;
+      throw error;
+    }
 
     const product = await Product.findOne({ where: { id: productId } });
 
@@ -199,15 +216,30 @@ export async function updateProduct(
 
     const discountedPrice = price - price * (discountPercentage / 100);
 
-    product.set({
-      title,
-      description,
-      price,
-      discount_percentage: discountPercentage,
-      discounted_price: discountedPrice,
-      stock_quantity: stockQuantity,
-      updated_at: updatedAt,
-    });
+    if (!file) {
+      product.set({
+        title,
+        description,
+        price,
+        discount_percentage: discountPercentage,
+        discounted_price: discountedPrice,
+        stock_quantity: stockQuantity,
+        updated_at: updatedAt,
+      });
+    } else {
+      const { downloadURL } = await imageUpload(file, 'products/');
+
+      product.set({
+        title,
+        description,
+        price,
+        discount_percentage: discountPercentage,
+        discounted_price: discountedPrice,
+        stock_quantity: stockQuantity,
+        image_url: downloadURL,
+        updated_at: updatedAt,
+      });
+    }
 
     const updatedProduct = await product.save();
 
@@ -238,6 +270,13 @@ export async function deleteProduct(
 ) {
   try {
     const productId = req.params.productId;
+    const isAdmin = req.isAdmin;
+
+    if (!isAdmin) {
+      const error: IError = new Error('Not authorized!');
+      error.statusCode = 401;
+      throw error;
+    }
 
     const product = await Product.findOne({ where: { id: productId } });
 
