@@ -2,13 +2,6 @@ import { DataTypes, ModelDefined, Optional } from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
-interface IRole {
-  id: number;
-  role_name: string;
-  created_at: string;
-  updated_at: string;
-}
-
 type RoleCreationAttributes = Optional<
   IRole,
   'id' | 'created_at' | 'updated_at'

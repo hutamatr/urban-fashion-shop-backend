@@ -2,14 +2,6 @@ import { DataTypes, ModelDefined, Optional } from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
-export interface IWishlist {
-  id: number;
-  product_id: number;
-  user_id: number;
-  created_at: string;
-  updated_at: string;
-}
-
 export type WishlistCreationAttributes = Optional<
   IWishlist,
   'id' | 'created_at' | 'updated_at'

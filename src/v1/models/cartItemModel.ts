@@ -2,15 +2,6 @@ import { DataTypes, ModelDefined, Optional } from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
-interface ICartItem {
-  id: number;
-  quantity: number;
-  cart_id: number;
-  product_id: number;
-  created_at: string;
-  updated_at: string;
-}
-
 type CartItemCreationAttributes = Optional<
   ICartItem,
   'id' | 'created_at' | 'updated_at'

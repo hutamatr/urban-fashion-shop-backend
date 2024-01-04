@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 
 import Product from '../models/productModel';
 import Wishlist from '../models/wishlistModel';
-import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
 
 interface IRequestBody {
@@ -19,6 +18,7 @@ export async function getWishlists(
 
     const wishlists = await Wishlist.findAll({
       where: { user_id: userId },
+      paranoid: false,
       include: [
         {
           model: Product,
@@ -30,7 +30,13 @@ export async function getWishlists(
             'price',
             'discount_percentage',
             'discounted_price',
+            'stock_quantity',
+            'category_id',
+            'created_at',
+            'updated_at',
+            'deleted_at',
           ],
+          paranoid: false,
         },
       ],
     });

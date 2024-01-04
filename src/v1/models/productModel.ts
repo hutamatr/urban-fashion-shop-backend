@@ -2,21 +2,6 @@ import { DataTypes, ModelDefined, Optional } from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
-interface IProduct {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  image_url: string;
-  discount_percentage: number;
-  discounted_price: number;
-  stock_quantity: number;
-  category_id: number;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string;
-}
-
 type ProductCreationAttributes = Optional<
   IProduct,
   'id' | 'created_at' | 'updated_at' | 'deleted_at'

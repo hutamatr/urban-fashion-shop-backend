@@ -2,10 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
-export interface IError extends Error {
-  statusCode?: number;
-}
-
 /**
  * The errorMiddleware function handles errors and sends a JSON response with the error status code and
  * message.

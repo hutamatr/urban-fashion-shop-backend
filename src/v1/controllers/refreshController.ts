@@ -1,14 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { IError } from '../../middleware/error';
-import errorHandler from '../../utils/errorHandler';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
-  generateToken,
   refreshTokenSecret,
-  verifyToken,
-} from '../../utils/jwt';
+} from '../../utils/constants';
+import errorHandler from '../../utils/errorHandler';
+import { generateToken, verifyToken } from '../../utils/jwt';
 
 export async function getRefreshToken(
   req: Request,

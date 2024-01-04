@@ -1,8 +1,6 @@
 import { NextFunction } from 'express';
 import { ValidationError as SequelizeValidationError } from 'sequelize';
 
-import { IError } from '../middleware/error';
-
 /**
  * The errorHandler function handles errors by setting a default status code and updating the error
  * message if it is a SequelizeValidationError.

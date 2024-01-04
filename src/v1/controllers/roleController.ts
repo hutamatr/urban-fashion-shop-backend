@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
 import Role from '../models/roleModel';
-import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
 
 interface IRequestBody {
