@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 
 import {
+  changePasswordValidation,
+  resetPasswordLinkValidation,
+  resetPasswordValidation,
   signInValidation,
   signUpValidation,
 } from '../validations/authValidation';
@@ -25,6 +28,9 @@ export const validate =
       | typeof signInValidation
       | typeof cartValidation
       | typeof categoryValidation
+      | typeof changePasswordValidation
+      | typeof resetPasswordLinkValidation
+      | typeof resetPasswordValidation
   ) =>
   async (req: Request, _res: Response, next: NextFunction) => {
     try {
