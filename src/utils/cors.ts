@@ -1,8 +1,5 @@
 import cors from 'cors';
 
-export const port = process.env.PORT;
-export const host = process.env.HOST;
-
 const whitelist = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
