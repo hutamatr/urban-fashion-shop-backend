@@ -1,17 +1,20 @@
+import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 
+import ResetPassword from '../models/resetPasswordModel';
 import Role from '../models/roleModel';
 import User from '../models/userModel';
-import { IError } from '../../middleware/error';
-import errorHandler from '../../utils/errorHandler';
-import { comparePassword, hashPassword } from '../../utils/hash';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
-  generateToken,
+  feBaseURL,
   refreshTokenExpiredIn,
   refreshTokenSecret,
-} from '../../utils/jwt';
+} from '../../utils/constants';
+import errorHandler from '../../utils/errorHandler';
+import { comparePassword, hashPassword } from '../../utils/hash';
+import { generateToken } from '../../utils/jwt';
+import sendEmail from '../../utils/sendEmail';
 
 interface IRequestParams {
   productId: string;
@@ -140,7 +143,11 @@ export async function signInUserHandler(
     const email = req.body.email;
     const password = req.body.password;
 
-    const user = await User.findOne({ where: { email } });
+    const getRole = await Role.findOne({ where: { role_name: 'user' } });
+
+    const roleId = getRole?.dataValues?.id;
+
+    const user = await User.findOne({ where: { email, role_id: roleId } });
 
     if (!user) {
       const error: IError = new Error(
@@ -236,5 +243,185 @@ export async function signOutHandler(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     errorHandler(error, 'Failed to signout, try again later!', next);
+  }
+}
+
+/**
+ * The above function is an async handler for changing a user's password, which verifies the current
+ * password, hashes the new password, and updates the user's password in the database.
+ * @param {Request} req - The `req` parameter represents the HTTP request object, which contains
+ * information about the incoming request such as headers, query parameters, and request body.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the response
+ * back to the client. It contains methods and properties for setting the response status, headers, and
+ * body. In this code, `res.status(200).json()` is used to send a JSON response with a success message
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function after completing the current one.
+ */
+export async function changePasswordHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId;
+    const currentPassword = req.body.current_password;
+    const newPassword = req.body.new_password;
+
+    const user = await User.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      const error: IError = new Error('User not found!');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const verifyCurrentPassword = await comparePassword(
+      currentPassword,
+      user.dataValues.password
+    );
+
+    if (!verifyCurrentPassword) {
+      const error: IError = new Error('Incorrect Password!');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const hashedNewPassword = await hashPassword(newPassword);
+
+    user.set({
+      password: hashedNewPassword,
+    });
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Password changed successfully!',
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    errorHandler(error, 'Failed to change password, try again later!', next);
+  }
+}
+
+/**
+ * The `resetPasswordLinkHandler` function handles the logic for generating and sending a reset
+ * password link to a user's email.
+ * @param {Request} req - The `req` parameter is the request object, which contains information about
+ * the incoming HTTP request, such as the request headers, request body, and request parameters.
+ * @param {Response} res - The `res` parameter is the response object that is used to send a response
+ * back to the client. It contains methods and properties that allow you to set the response status,
+ * headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function after completing a specific task.
+ */
+export async function resetPasswordLinkHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const email = req.body.email;
+
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      const error: IError = new Error('User not found!');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    let resetPasswordToken;
+
+    resetPasswordToken = await ResetPassword.findOne({
+      where: { user_id: user.dataValues.id },
+    });
+
+    if (!resetPasswordToken) {
+      resetPasswordToken = await ResetPassword.create({
+        user_id: user.dataValues.id,
+        token: crypto.randomBytes(32).toString('hex'),
+      });
+    }
+
+    const link = `${feBaseURL}/reset-password/${user.dataValues.id}/${resetPasswordToken.dataValues.token}`;
+    await sendEmail(user.dataValues.email, 'Reset Password', link);
+
+    res.status(200).json({
+      message: 'Reset password link sent to your email!',
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    errorHandler(
+      error,
+      'Failed to send reset password link, try again later!',
+      next
+    );
+  }
+}
+
+/**
+ * The function `resetPasswordHandler` is an asynchronous function that handles the reset password
+ * functionality by verifying the user and token, updating the user's password, and returning a success
+ * message.
+ * @param {Request} req - The `req` parameter is an object that represents the HTTP request made to the
+ * server. It contains information such as the request headers, request body, request method, request
+ * URL, and request parameters.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the response
+ * back to the client. It contains methods and properties that allow you to set the response status,
+ * headers, and body. In this code, `res.status(200).json(...)` is used to set the response status
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function in the chain.
+ */
+export async function resetPasswordHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.params.userId;
+    const resetPasswordToken = req.params.token;
+    const newPassword = req.body.new_password;
+
+    const user = await User.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      const error: IError = new Error('Invalid link or expired!');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const token = await ResetPassword.findOne({
+      where: { user_id: user.dataValues.id, token: resetPasswordToken },
+    });
+
+    if (!token) {
+      const error: IError = new Error('Invalid link or expired!');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    user.set({
+      password: hashedPassword,
+    });
+
+    await user.save();
+    await token.destroy({ force: true });
+
+    res.status(200).json({
+      message: 'Password reset successfully!',
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    errorHandler(error, 'Failed to reset password, try again later!', next);
   }
 }
