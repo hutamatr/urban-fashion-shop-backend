@@ -1,10 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-export const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-export const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
-export const accessTokenExpiresIn = process.env.ACCESS_TOKEN_EXPIRED;
-export const refreshTokenExpiredIn = process.env.REFRESH_TOKEN_EXPIRED;
-export const adminCode = process.env.ADMIN_CODE;
+import { accessTokenExpiresIn } from './constants';
 
 /**
  * The function generates a token using the provided payload, token secret, and expiration time.

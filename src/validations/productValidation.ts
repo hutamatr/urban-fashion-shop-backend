@@ -48,5 +48,9 @@ export const productValidation = zod.object({
         invalid_type_error: 'Quantity must be a string',
       })
       .min(1, { message: 'Quantity must be greater than 0' }),
+    category_id: zod.string({
+      required_error: 'Category id is required',
+      invalid_type_error: 'Category id must be a string',
+    }),
   }),
 });

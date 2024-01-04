@@ -1,11 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 
 import Category from '../models/categoryModel';
-import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
 
 interface IRequestBody {
   category_name: string;
+}
+interface IRequestQuery {
+  limit: string;
+  skip: string;
 }
 
 /**
@@ -22,12 +25,23 @@ interface IRequestBody {
  * move on to the next middleware function in the chain.
  */
 export async function getCategories(
-  _req: Request,
+  req: Request<object, object, object, IRequestQuery>,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const categories = await Category.findAll();
+    const limit = +req.query.limit;
+    const skip = +req.query.skip || 0;
+    let categories;
+
+    if (limit > 0 && skip >= 0) {
+      categories = await Category.findAll({
+        offset: skip,
+        limit: limit,
+      });
+    } else {
+      categories = await Category.findAll();
+    }
 
     if (!categories) {
       const error: IError = new Error('Failed to get categories!');
@@ -35,7 +49,11 @@ export async function getCategories(
       throw error;
     }
 
-    res.status(200).json({ categories });
+    const total = await Category.count();
+
+    res
+      .status(200)
+      .json({ categories, total, skip, limit: categories?.length });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     errorHandler(error, 'Failed to get categories, try again later!', next);
@@ -100,6 +118,13 @@ export async function createCategory(
 ) {
   try {
     const categoryName = req.body.category_name;
+    const isAdmin = req.isAdmin;
+
+    if (!isAdmin) {
+      const error: IError = new Error('Not authorized!');
+      error.statusCode = 401;
+      throw error;
+    }
 
     const createdCategory = await Category.create({
       category_name: categoryName,
@@ -140,8 +165,15 @@ export async function updateCategory(
   next: NextFunction
 ) {
   try {
-    const categoryName = req.body.name;
+    const categoryName = req.body.category_name;
     const categoryId = req.params.categoryId;
+    const isAdmin = req.isAdmin;
+
+    if (!isAdmin) {
+      const error: IError = new Error('Not authorized!');
+      error.statusCode = 401;
+      throw error;
+    }
 
     const category = await Category.findOne({
       where: { id: categoryId },
@@ -197,6 +229,13 @@ export async function deleteCategory(
 ) {
   try {
     const categoryId = req.params.categoryId;
+    const isAdmin = req.isAdmin;
+
+    if (!isAdmin) {
+      const error: IError = new Error('Not authorized!');
+      error.statusCode = 401;
+      throw error;
+    }
 
     const deletedCategory = await Category.destroy({
       where: { id: categoryId },

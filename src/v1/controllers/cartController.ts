@@ -3,7 +3,6 @@ import { NextFunction, Request, Response } from 'express';
 import CartItem from '../models/cartItemModel';
 import Cart from '../models/cartModel';
 import Product from '../models/productModel';
-import { IError } from '../../middleware/error';
 import errorHandler from '../../utils/errorHandler';
 
 interface IRequestBody {
@@ -379,11 +378,15 @@ export async function deleteCart(
       throw error;
     }
 
-    userCart.set({
-      total_price: newTotalPrice,
-    });
+    if (newTotalPrice > 0) {
+      userCart.set({
+        total_price: newTotalPrice,
+      });
 
-    await userCart.save();
+      await userCart.save();
+    } else {
+      await userCart.destroy();
+    }
 
     res.status(200).json({
       message: 'Delete product from cart successfully!',

@@ -2,17 +2,16 @@ import { NextFunction, Request, Response } from 'express';
 
 import Role from '../models/roleModel';
 import User from '../models/userModel';
-import { IError } from '../../middleware/error';
-import errorHandler from '../../utils/errorHandler';
-import { comparePassword, hashPassword } from '../../utils/hash';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
   adminCode,
-  generateToken,
   refreshTokenExpiredIn,
   refreshTokenSecret,
-} from '../../utils/jwt';
+} from '../../utils/constants';
+import errorHandler from '../../utils/errorHandler';
+import { comparePassword, hashPassword } from '../../utils/hash';
+import { generateToken } from '../../utils/jwt';
 
 export async function signUpAdminHandler(
   req: Request,
@@ -114,9 +113,19 @@ export async function signInAdminHandler(
 
     const admin = await User.findOne({ where: { email } });
 
+    const getRoles = await Role.findOne({ where: { role_name: 'admin' } });
+
     if (!admin) {
       const error: IError = new Error(
         'Admin with this email could not be found!'
+      );
+      error.statusCode = 401;
+      throw error;
+    }
+
+    if (admin?.dataValues.role_id !== getRoles?.dataValues.id) {
+      const error: IError = new Error(
+        'You do not have permission to access this resource!'
       );
       error.statusCode = 401;
       throw error;

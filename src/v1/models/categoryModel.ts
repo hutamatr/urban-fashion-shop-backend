@@ -2,13 +2,6 @@ import { DataTypes, ModelDefined, Optional } from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
-interface ICategory {
-  id: number;
-  category_name: string;
-  created_at: string;
-  updated_at: string;
-}
-
 type CategoryCreationAttributes = Optional<
   ICategory,
   'id' | 'created_at' | 'updated_at'

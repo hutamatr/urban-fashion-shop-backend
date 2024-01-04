@@ -95,7 +95,75 @@ export const signInValidation = zod.object({
       .min(8, { message: 'Password must be at least 8 characters long' })
       .max(32, { message: 'Password must be less than 32 characters' })
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&_])[A-Za-z\d$@$!%*?&_]{6,12}$/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&_])[A-Za-z\d$@$!%*?&_]{8,32}$/,
+        {
+          message:
+            'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
+        }
+      ),
+  }),
+});
+
+export const changePasswordValidation = zod.object({
+  body: zod.object({
+    current_password: zod
+      .string({
+        required_error: 'Old password is required',
+        invalid_type_error: 'Old password must be a string',
+      })
+      .trim()
+      .min(8, { message: 'Old password must be at least 8 characters long' })
+      .max(32, { message: 'Old password must be less than 32 characters' }),
+    new_password: zod
+      .string({
+        required_error: 'New password is required',
+        invalid_type_error: 'New password must be a string',
+      })
+      .trim()
+      .min(8, { message: 'New password must be at least 8 characters long' })
+      .max(32, { message: 'New password must be less than 32 characters' })
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&_])[A-Za-z\d$@$!%*?&_]{8,32}$/,
+        {
+          message:
+            'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
+        }
+      ),
+  }),
+});
+
+export const resetPasswordLinkValidation = zod.object({
+  body: zod.object({
+    email: zod
+      .string({
+        required_error: 'Email is required',
+        invalid_type_error: 'Email must be a string',
+      })
+      .email({
+        message: 'Email must be a valid email',
+      })
+      .refine(
+        async (value) => {
+          const userByEmail = await User.findOne({ where: { email: value } });
+          return !!userByEmail;
+        },
+        { message: 'User with this email are not exist!' }
+      ),
+  }),
+});
+
+export const resetPasswordValidation = zod.object({
+  body: zod.object({
+    new_password: zod
+      .string({
+        required_error: 'Password is required',
+        invalid_type_error: 'Password must be a string',
+      })
+      .trim()
+      .min(8, { message: 'Password must be at least 8 characters long' })
+      .max(32, { message: 'Password must be less than 32 characters' })
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&_])[A-Za-z\d$@$!%*?&_]{8,32}$/,
         {
           message:
             'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',

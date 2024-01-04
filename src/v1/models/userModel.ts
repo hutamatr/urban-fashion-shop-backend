@@ -2,20 +2,16 @@ import { DataTypes, ModelDefined, Optional } from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
-export interface IUser {
-  id: number;
-  email: string;
-  password: string;
-  first_name: string;
-  role_id: number;
-  last_name: string;
-  created_at: string;
-  updated_at: string;
-}
-
 export type UserCreationAttributes = Optional<
   IUser,
-  'id' | 'first_name' | 'last_name' | 'created_at' | 'updated_at'
+  | 'id'
+  | 'first_name'
+  | 'last_name'
+  | 'address'
+  | 'phone_number'
+  | 'created_at'
+  | 'updated_at'
+  | 'deleted_at'
 >;
 
 /**
@@ -46,6 +42,14 @@ const User: ModelDefined<IUser, UserCreationAttributes> = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    address: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    phone_number: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     role_id: {
       type: DataTypes.INTEGER.UNSIGNED,
       references: {
@@ -55,9 +59,11 @@ const User: ModelDefined<IUser, UserCreationAttributes> = sequelize.define(
     },
   },
   {
-    underscored: true,
     createdAt: 'created_at',
     updatedAt: 'updated_at',
+    deletedAt: 'deleted_at',
+    underscored: true,
+    paranoid: true,
   }
 );
 

@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 
-import { IError } from './error';
-import { accessTokenSecret, verifyToken } from '../utils/jwt';
+import { accessTokenSecret } from '../utils/constants';
+import { verifyToken } from '../utils/jwt';
+import Role from '../v1/models/roleModel';
 import User from '../v1/models/userModel';
 
 /**
@@ -46,11 +47,20 @@ export async function authMiddleware(
     }
 
     const user = await User.findOne({
-      where: { id: credential.id, email: credential.email },
+      where: {
+        id: credential.id,
+        email: credential.email,
+      },
     });
 
     req.user = user;
     req.userId = credential.id;
+
+    const getRoles = await Role.findOne({ where: { role_name: 'admin' } });
+
+    if (user?.dataValues.role_id === getRoles?.dataValues.id) {
+      req.isAdmin = true;
+    }
 
     next();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
