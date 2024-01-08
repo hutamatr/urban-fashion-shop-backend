@@ -1,22 +1,33 @@
-import { DataTypes, ModelDefined, Optional } from 'sequelize';
+import {
+  CreationOptional,
+  DataTypes,
+  InferAttributes,
+  InferCreationAttributes,
+  Model,
+} from 'sequelize';
 
 import { sequelize } from '../../database/db';
 
-export type UserCreationAttributes = Optional<
-  IUser,
-  | 'id'
-  | 'first_name'
-  | 'last_name'
-  | 'address'
-  | 'phone_number'
-  | 'created_at'
-  | 'updated_at'
-  | 'deleted_at'
->;
+interface IUser
+  extends Model<InferAttributes<IUser>, InferCreationAttributes<IUser>> {
+  id: CreationOptional<number>;
+  email: string;
+  password: string;
+  first_name: CreationOptional<string>;
+  last_name: CreationOptional<string>;
+  city: CreationOptional<string>;
+  postal_code: CreationOptional<string>;
+  address: CreationOptional<string>;
+  phone_number: CreationOptional<string>;
+  role_id: number;
+  created_at: CreationOptional<Date>;
+  updated_at: CreationOptional<Date>;
+  deleted_at: CreationOptional<Date>;
+}
 
 /**
  * The code is defining a Sequelize model called "User" with the specified attributes and options. **/
-const User: ModelDefined<IUser, UserCreationAttributes> = sequelize.define(
+const User = sequelize.define<IUser>(
   'user',
   {
     id: {
@@ -42,10 +53,19 @@ const User: ModelDefined<IUser, UserCreationAttributes> = sequelize.define(
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    city: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    postal_code: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
     address: {
       type: DataTypes.TEXT,
       allowNull: true,
     },
+
     phone_number: {
       type: DataTypes.STRING(255),
       allowNull: true,
@@ -56,6 +76,18 @@ const User: ModelDefined<IUser, UserCreationAttributes> = sequelize.define(
         model: 'roles',
         key: 'id',
       },
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
     },
   },
   {

@@ -6,10 +6,10 @@ import {
   getProduct,
   getProducts,
   updateProduct,
-} from '../controllers/productController';
+} from '../controllers/product.controller';
 import { authMiddleware } from '../../middleware/auth';
 import { validate } from '../../middleware/validation';
-import { productValidation } from '../../validations/productValidation';
+import { productValidation } from '../../validations/product.validation';
 
 const router = Router();
 

@@ -10,25 +10,28 @@ import { sequelize } from './database/db';
 import errorMiddleware from './middleware/error';
 import { host, port } from './utils/constants';
 import corsMiddleware from './utils/cors';
-import errorHandler from './utils/errorHandler';
+import errorHandler from './utils/error-handler';
 import logger from './utils/logger';
-import limiter from './utils/rateLimiter';
-import CartItem from './v1/models/cartItemModel';
-import Cart from './v1/models/cartModel';
-import Category from './v1/models/categoryModel';
-import Product from './v1/models/productModel';
-import ResetPassword from './v1/models/resetPasswordModel';
-import Role from './v1/models/roleModel';
-import User from './v1/models/userModel';
-import Wishlist from './v1/models/wishlistModel';
-import authRoutes from './v1/routes/authRoutes';
-import cartRoutes from './v1/routes/cartRoutes';
-import categoryRoutes from './v1/routes/categoryRoutes';
-import productRoutes from './v1/routes/productRoutes';
-import refreshRoutes from './v1/routes/refreshRoutes';
-import roleRoutes from './v1/routes/roleRoutes';
-import userRoutes from './v1/routes/userRoutes';
-import wishlistRoutes from './v1/routes/wishlistRoutes';
+import limiter from './utils/rate-limiter';
+import Cart from './v1/models/cart.model';
+import CartItem from './v1/models/cart-item.model';
+import Category from './v1/models/category.model';
+import Product from './v1/models/product.model';
+import ResetPassword from './v1/models/reset-password.model';
+import Role from './v1/models/role.model';
+import Transaction from './v1/models/transaction.model';
+import TransactionItem from './v1/models/transaction-item.model';
+import User from './v1/models/user.model';
+import Wishlist from './v1/models/wishlist.model';
+import authRoutes from './v1/routes/auth.routes';
+import cartRoutes from './v1/routes/cart.routes';
+import categoryRoutes from './v1/routes/category.routes';
+import productRoutes from './v1/routes/product.routes';
+import refreshRoutes from './v1/routes/refresh.routes';
+import roleRoutes from './v1/routes/role.routes';
+import transactionRoutes from './v1/routes/transaction.routes';
+import userRoutes from './v1/routes/user.routes';
+import wishlistRoutes from './v1/routes/wishlist.routes';
 
 const app = express();
 const storage = multer.memoryStorage();
@@ -48,6 +51,7 @@ app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/wishlists', wishlistRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/carts', cartRoutes);
+app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/roles', roleRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1', authRoutes);
@@ -93,6 +97,20 @@ Wishlist.belongsTo(Product, { foreignKey: 'product_id' });
 // ResetPassword & User Associations
 User.hasOne(ResetPassword, { foreignKey: 'user_id' });
 ResetPassword.belongsTo(User, { foreignKey: 'user_id' });
+
+// Transaction & User Associations
+Transaction.belongsTo(User, { foreignKey: 'user_id' });
+User.hasMany(Transaction, { foreignKey: 'user_id' });
+
+// Transaction & Product Associations
+Transaction.belongsToMany(Product, {
+  through: TransactionItem,
+  foreignKey: 'transaction_id',
+});
+Product.belongsToMany(Transaction, {
+  through: TransactionItem,
+  foreignKey: 'product_id',
+});
 
 sequelize
   // .sync({ force: true })

@@ -1,6 +1,6 @@
 import { z as zod } from 'zod';
 
-import User from '../v1/models/userModel';
+import User from '../v1/models/user.model';
 
 /** The `signUpValidation` constant is an object that defines the validation schema for the sign-up
  * process. It uses the `zod` library to define the validation rules for the request body.

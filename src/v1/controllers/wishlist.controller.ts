@@ -1,13 +1,25 @@
 import { NextFunction, Request, Response } from 'express';
 
-import Product from '../models/productModel';
-import Wishlist from '../models/wishlistModel';
-import errorHandler from '../../utils/errorHandler';
+import Product from '../models/product.model';
+import Wishlist from '../models/wishlist.model';
+import errorHandler from '../../utils/error-handler';
 
 interface IRequestBody {
   product_id: number;
 }
 
+/**
+ * The function `getWishlists` retrieves wishlists associated with a user and includes the products in
+ * each wishlist.
+ * @param {Request} req - The `req` parameter represents the HTTP request object, which contains
+ * information about the incoming request such as headers, query parameters, and request body.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status,
+ * headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function after completing the current one.
+ */
 export async function getWishlists(
   req: Request,
   res: Response,
@@ -57,6 +69,18 @@ export async function getWishlists(
   }
 }
 
+/**
+ * The function `getWishlist` retrieves a wishlist item for a specific product and user, and returns it
+ * as a JSON response.
+ * @param {Request} req - The `req` parameter is the request object, which contains information about
+ * the HTTP request made by the client.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status
+ * code, headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function in the chain.
+ */
 export async function getWishlist(
   req: Request,
   res: Response,
@@ -97,6 +121,18 @@ export async function getWishlist(
   }
 }
 
+/**
+ * The function `createWishlist` creates a new wishlist for a user with a specified product, and
+ * returns the created wishlist with product details.
+ * @param req - The `req` parameter is an object that represents the HTTP request made to the server.
+ * It contains information such as the request method, headers, query parameters, and body.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It is responsible for setting the status code, headers, and sending the
+ * response body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function after completing the current one.
+ */
 export async function createWishlist(
   req: Request<object, object, IRequestBody, object>,
   res: Response,
@@ -156,6 +192,19 @@ export async function createWishlist(
   }
 }
 
+/**
+ * The function `deleteWishlist` is an asynchronous function that deletes a wishlist item based on the
+ * user ID and product ID provided in the request parameters.
+ * @param {Request} req - The `req` parameter is the request object that contains information about the
+ * HTTP request made by the client. It includes properties such as headers, query parameters, request
+ * body, and user authentication details.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the response
+ * back to the client. It contains methods and properties for setting the response status, headers, and
+ * body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function in the chain.
+ */
 export async function deleteWishlist(
   req: Request,
   res: Response,

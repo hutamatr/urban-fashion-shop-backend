@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 
-import Category from '../models/categoryModel';
-import Product from '../models/productModel';
+import Category from '../models/category.model';
+import Product from '../models/product.model';
 import {
   deleteImageFromStorage,
   imageUpload,
-} from '../../database/firebaseStorage';
-import errorHandler from '../../utils/errorHandler';
+} from '../../database/firebase.storage';
+import errorHandler from '../../utils/error-handler';
 
 interface IRequestParams {
   productId: string;
@@ -195,7 +195,6 @@ export async function updateProduct(
     const discountPercentage = Number(req.body.discount_percentage);
     const stockQuantity = Number(req.body.stock_quantity);
     const file = req.file;
-    const updatedAt = new Date().toISOString();
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
@@ -224,7 +223,6 @@ export async function updateProduct(
         discount_percentage: discountPercentage,
         discounted_price: discountedPrice,
         stock_quantity: stockQuantity,
-        updated_at: updatedAt,
       });
     } else {
       const { downloadURL } = await imageUpload(file, 'products/');
@@ -237,7 +235,6 @@ export async function updateProduct(
         discounted_price: discountedPrice,
         stock_quantity: stockQuantity,
         image_url: downloadURL,
-        updated_at: updatedAt,
       });
     }
 

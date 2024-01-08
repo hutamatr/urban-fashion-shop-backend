@@ -1,9 +1,23 @@
 import { NextFunction, Request, Response } from 'express';
 
-import Role from '../models/roleModel';
-import User from '../models/userModel';
-import errorHandler from '../../utils/errorHandler';
+import Role from '../models/role.model';
+import User from '../models/user.model';
+import errorHandler from '../../utils/error-handler';
 
+/**
+ * The above function is an asynchronous function that retrieves users from a database based on certain
+ * criteria and returns the users along with the total count, skip value, and limit value in the
+ * response.
+ * @param {Request} req - The `req` parameter represents the HTTP request object, which contains
+ * information about the incoming request such as headers, query parameters, and body.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status,
+ * headers, and body. In this code, it is used to send the JSON response containing the users, total
+ * count, skip, and
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function in the chain.
+ */
 export async function getUsers(
   req: Request,
   res: Response,
@@ -84,6 +98,18 @@ export async function getUsers(
   }
 }
 
+/**
+ * The function `getUser` retrieves a user from the database based on the provided user ID and returns
+ * the user's information along with a success message.
+ * @param {Request} req - The `req` parameter represents the HTTP request object, which contains
+ * information about the incoming request such as headers, query parameters, and request body.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status
+ * code, headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function after completing the current one.
+ */
 export async function getUser(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.userId;
@@ -95,6 +121,8 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
         'first_name',
         'last_name',
         'email',
+        'city',
+        'postal_code',
         'address',
         'phone_number',
         'created_at',
@@ -123,6 +151,19 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+/**
+ * The updateUser function updates a user's information in a database based on the provided request
+ * data.
+ * @param {Request} req - The `req` parameter is the request object that contains information about the
+ * HTTP request made by the client. It includes properties such as the request headers, request body,
+ * request method, and request URL.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the response
+ * back to the client. It contains methods and properties for manipulating the response, such as
+ * setting the status code, sending JSON data, or redirecting the client to another URL.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function in the chain.
+ */
 export async function updateUser(
   req: Request,
   res: Response,
@@ -162,6 +203,18 @@ export async function updateUser(
   }
 }
 
+/**
+ * The deleteUser function is an asynchronous function that deletes a user from the database if the
+ * requesting user is an admin, otherwise it throws an error.
+ * @param {Request} req - The `req` parameter represents the HTTP request object, which contains
+ * information about the incoming request such as headers, query parameters, and request body.
+ * @param {Response} res - The `res` parameter is the response object that is used to send the HTTP
+ * response back to the client. It contains methods and properties for setting the response status
+ * code, headers, and body.
+ * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
+ * next middleware function in the request-response cycle. It is typically used to handle errors or to
+ * move on to the next middleware function in the chain.
+ */
 export async function deleteUser(
   req: Request,
   res: Response,

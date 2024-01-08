@@ -3,8 +3,8 @@ import { JwtPayload } from 'jsonwebtoken';
 
 import { accessTokenSecret } from '../utils/constants';
 import { verifyToken } from '../utils/jwt';
-import Role from '../v1/models/roleModel';
-import User from '../v1/models/userModel';
+import Role from '../v1/models/role.model';
+import User from '../v1/models/user.model';
 
 /**
  * The `authMiddleware` function is an asynchronous middleware function that checks for a valid
