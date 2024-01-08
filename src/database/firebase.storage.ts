@@ -6,7 +6,7 @@ import {
 } from 'firebase/storage';
 global.XMLHttpRequest = require('xhr2');
 
-import { storage } from './firebaseConfig';
+import { storage } from './firebase.config';
 
 export async function imageUpload(file: Express.Multer.File, url: string) {
   const storageRef = ref(storage, url);
@@ -24,7 +24,6 @@ export async function imageUpload(file: Express.Multer.File, url: string) {
 }
 
 export async function deleteImageFromStorage(imageURL: string, url: string) {
-  // Use a regular expression to match the encoded filename
   // eslint-disable-next-line no-useless-escape
   const match = RegExp(/\/([^\/?#]+)(?:[?#]|$)/).exec(imageURL);
 

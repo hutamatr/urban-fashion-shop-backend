@@ -6,10 +6,10 @@ import {
   getCategories,
   getCategory,
   updateCategory,
-} from '../controllers/categoryController';
+} from '../controllers/category.controller';
 import { authMiddleware } from '../../middleware/auth';
 import { validate } from '../../middleware/validation';
-import { categoryValidation } from '../../validations/categoryValidation';
+import { categoryValidation } from '../../validations/category.validation';
 
 const router = Router();
 

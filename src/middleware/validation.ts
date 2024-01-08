@@ -6,10 +6,10 @@ import {
   resetPasswordValidation,
   signInValidation,
   signUpValidation,
-} from '../validations/authValidation';
-import { cartValidation } from '../validations/cartValidation';
-import { categoryValidation } from '../validations/categoryValidation';
-import { productValidation } from '../validations/productValidation';
+} from '../validations/auth.validation';
+import { cartValidation } from '../validations/cart.validation';
+import { categoryValidation } from '../validations/category.validation';
+import { productValidation } from '../validations/product.validation';
 
 /**
  * The `validate` function is a middleware that validates the request body, query parameters, and route

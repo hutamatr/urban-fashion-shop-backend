@@ -5,10 +5,10 @@ import {
   deleteCart,
   getCart,
   updateCart,
-} from '../controllers/cartController';
+} from '../controllers/cart.controller';
 import { authMiddleware } from '../../middleware/auth';
 import { validate } from '../../middleware/validation';
-import { cartValidation } from '../../validations/cartValidation';
+import { cartValidation } from '../../validations/cart.validation';
 
 const router = Router();
 

@@ -5,28 +5,9 @@ declare global {
     statusCode?: number;
   }
 
-  interface ICart {
-    id: number;
-    total_price: number;
-    user_id: number;
-    created_at: string;
-    updated_at: string;
-  }
-
-  interface ICartItem {
-    id: number;
-    quantity: number;
-    cart_id: number;
-    product_id: number;
-    created_at: string;
-    updated_at: string;
-  }
-
-  interface ICategory {
-    id: number;
-    category_name: string;
-    created_at: string;
-    updated_at: string;
+  interface IMidtransResponse {
+    token: string;
+    redirect_url: string;
   }
 
   interface IProduct {
@@ -42,42 +23,30 @@ declare global {
     created_at: string;
     updated_at: string;
     deleted_at: string;
+    cart_item: {
+      quantity: number;
+    };
   }
 
-  interface IResetPassword {
-    id: number;
-    user_id: number;
-    token: string;
-    created_at: string;
-    updated_at: string;
-  }
-
-  interface IRole {
-    id: number;
-    role_name: string;
-    created_at: string;
-    updated_at: string;
-  }
-
-  export interface IUser {
-    id: number;
-    email: string;
-    password: string;
-    first_name: string;
-    last_name: string;
-    address: string;
-    phone_number: string;
-    role_id: number;
-    created_at: string;
-    updated_at: string;
-    deleted_at: string;
-  }
-
-  export interface IWishlist {
-    id: number;
-    product_id: number;
-    user_id: number;
-    created_at: string;
-    updated_at: string;
+  interface IMidtransNotification {
+    transaction_time: string;
+    transaction_status: string;
+    transaction_id: string;
+    status_message: string;
+    status_code: string;
+    signature_key: string;
+    payment_type: string;
+    order_id: string;
+    merchant_id: string;
+    masked_card: string;
+    gross_amount: string;
+    fraud_status: string;
+    eci: string;
+    currency: string;
+    channel_response_message: string;
+    channel_response_code: string;
+    card_type: string;
+    bank: string;
+    approval_code: string;
   }
 }

@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 
-import CartItem from '../models/cartItemModel';
-import Cart from '../models/cartModel';
-import Product from '../models/productModel';
-import errorHandler from '../../utils/errorHandler';
+import Cart from '../models/cart.model';
+import CartItem from '../models/cart-item.model';
+import Product from '../models/product.model';
+import errorHandler from '../../utils/error-handler';
 
 interface IRequestBody {
   product_id: number;
@@ -120,8 +120,6 @@ export async function createCart(
     } else {
       price = product?.dataValues.price as number;
     }
-
-    // const price = product?.dataValues.price as number;
 
     if (userCart) {
       const cartItemProduct = await CartItem.findOne({

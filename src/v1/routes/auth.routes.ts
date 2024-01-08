@@ -1,17 +1,17 @@
 import { Router } from 'express';
 
 import {
-  signInAdminHandler,
-  signUpAdminHandler,
-} from '../controllers/authAdminController';
-import {
   changePasswordHandler,
   resetPasswordHandler,
   resetPasswordLinkHandler,
   signInUserHandler,
   signOutHandler,
   signUpUserHandler,
-} from '../controllers/authController';
+} from '../controllers/auth.controller';
+import {
+  signInAdminHandler,
+  signUpAdminHandler,
+} from '../controllers/auth-admin.controller';
 import { authMiddleware } from '../../middleware/auth';
 import { validate } from '../../middleware/validation';
 import {
@@ -20,7 +20,7 @@ import {
   resetPasswordValidation,
   signInValidation,
   signUpValidation,
-} from '../../validations/authValidation';
+} from '../../validations/auth.validation';
 
 const router = Router();
 

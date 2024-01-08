@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 
-import ResetPassword from '../models/resetPasswordModel';
-import Role from '../models/roleModel';
-import User from '../models/userModel';
+import ResetPassword from '../models/reset-password.model';
+import Role from '../models/role.model';
+import User from '../models/user.model';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
@@ -11,10 +11,10 @@ import {
   refreshTokenExpiredIn,
   refreshTokenSecret,
 } from '../../utils/constants';
-import errorHandler from '../../utils/errorHandler';
+import errorHandler from '../../utils/error-handler';
 import { comparePassword, hashPassword } from '../../utils/hash';
 import { generateToken } from '../../utils/jwt';
-import sendEmail from '../../utils/sendEmail';
+import sendEmail from '../../utils/send-email';
 
 interface IRequestParams {
   productId: string;

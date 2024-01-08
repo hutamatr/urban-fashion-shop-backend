@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
-import Category from '../models/categoryModel';
-import errorHandler from '../../utils/errorHandler';
+import Category from '../models/category.model';
+import errorHandler from '../../utils/error-handler';
 
 interface IRequestBody {
   category_name: string;
