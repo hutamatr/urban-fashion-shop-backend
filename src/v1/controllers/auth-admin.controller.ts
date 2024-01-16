@@ -48,8 +48,8 @@ export async function signUpAdminHandler(
       throw error;
     }
 
-    let roleId;
     const hashedPassword = await hashPassword(password);
+    let roleId;
     const getRoles = await Role.findOne({ where: { role_name: 'admin' } });
     roleId = getRoles?.dataValues?.id;
 
@@ -99,8 +99,9 @@ export async function signUpAdminHandler(
     });
 
     res.status(201).json({
-      access_token: accessToken,
+      status: 'success',
       message: 'Signup new admin successfully!',
+      access_token: accessToken,
       user: {
         id,
         email: adminEmail,
@@ -188,8 +189,9 @@ export async function signInAdminHandler(
     });
 
     res.status(200).json({
-      access_token: accessToken,
+      status: 'success',
       message: 'Signin admin successfully!',
+      access_token: accessToken,
       user: {
         id,
         email: adminEmail,

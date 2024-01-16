@@ -51,9 +51,14 @@ export async function getCategories(
 
     const total = await Category.count();
 
-    res
-      .status(200)
-      .json({ categories, total, skip, limit: categories?.length });
+    res.status(200).json({
+      status: 'success',
+      message: 'Categories fetched successfully',
+      categories,
+      total,
+      skip,
+      limit: categories?.length,
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     errorHandler(error, 'Failed to get categories, try again later!', next);
@@ -91,7 +96,11 @@ export async function getCategory(
       throw error;
     }
 
-    res.status(200).json({ category });
+    res.status(200).json({
+      status: 'success',
+      message: 'Category fetched successfully',
+      category,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -137,6 +146,7 @@ export async function createCategory(
     }
 
     res.status(201).json({
+      status: 'success',
       message: 'Create category successfully!',
       category: createdCategory.dataValues,
     });
@@ -200,6 +210,7 @@ export async function updateCategory(
     }
 
     res.status(200).json({
+      status: 'success',
       message: 'Update category successfully!',
       category: updatedCategory,
     });
@@ -250,8 +261,8 @@ export async function deleteCategory(
     }
 
     res.status(200).json({
+      status: 'success',
       message: 'Delete category successfully!',
-      deleted: true,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

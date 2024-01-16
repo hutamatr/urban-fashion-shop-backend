@@ -70,7 +70,14 @@ export async function getProducts(
 
     const total = await Product.count();
 
-    res.status(200).json({ products, total, skip, limit: products?.length });
+    res.status(200).json({
+      status: 'success',
+      message: 'Products retrieved successfully',
+      products,
+      total,
+      skip,
+      limit: products?.length,
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     errorHandler(error, 'Failed to get products list, try again later!', next);
@@ -98,7 +105,11 @@ export async function getProduct(
       throw error;
     }
 
-    res.status(200).json({ product });
+    res.status(200).json({
+      status: 'success',
+      message: 'Product retrieved successfully',
+      product,
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     errorHandler(error, 'Failed to get product, try again later!', next);
@@ -169,6 +180,7 @@ export async function createProduct(
     }
 
     res.status(201).json({
+      status: 'success',
       message: 'Create product successfully!',
       product: createdProduct.dataValues,
     });
@@ -247,6 +259,7 @@ export async function updateProduct(
     }
 
     res.status(201).json({
+      status: 'success',
       message: 'Update product successfully!',
       product: updatedProduct,
     });
@@ -293,8 +306,8 @@ export async function deleteProduct(
     }
 
     res.status(200).json({
+      status: 'success',
       message: 'Delete product successfully!',
-      deleted: true,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
