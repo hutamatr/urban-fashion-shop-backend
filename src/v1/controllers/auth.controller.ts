@@ -107,8 +107,9 @@ export async function signUpUserHandler(
     });
 
     res.status(201).json({
-      access_token: accessToken,
+      status: 'success',
       message: 'Signup new user successfully!',
+      access_token: accessToken,
       user: {
         id,
         email: userEmail,
@@ -190,8 +191,9 @@ export async function signInUserHandler(
     });
 
     res.status(200).json({
-      access_token: accessToken,
+      status: 'success',
       message: 'Signin user successfully!',
+      access_token: accessToken,
       user: {
         id,
         email: userEmail,
@@ -239,7 +241,9 @@ export async function signOutHandler(
       secure: false,
     });
 
-    res.status(200).json({ sign_out: true, message: 'Signout successfully' });
+    res
+      .status(200)
+      .json({ status: 'success', message: 'Signout successfully' });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     errorHandler(error, 'Failed to signout, try again later!', next);
@@ -298,6 +302,7 @@ export async function changePasswordHandler(
     await user.save();
 
     res.status(200).json({
+      status: 'success',
       message: 'Password changed successfully!',
     });
 
@@ -352,6 +357,7 @@ export async function resetPasswordLinkHandler(
     await sendEmail(user.dataValues.email, 'Reset Password', link);
 
     res.status(200).json({
+      status: 'success',
       message: 'Reset password link sent to your email!',
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -418,6 +424,7 @@ export async function resetPasswordHandler(
     await token.destroy({ force: true });
 
     res.status(200).json({
+      status: 'success',
       message: 'Password reset successfully!',
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

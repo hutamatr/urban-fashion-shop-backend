@@ -4,6 +4,7 @@ import {
   InferAttributes,
   InferCreationAttributes,
   Model,
+  NonAttribute,
 } from 'sequelize';
 
 import { sequelize } from '../../database/db';
@@ -17,11 +18,14 @@ export interface ITransaction
   user_id: number;
   total_price: number;
   status: 'PENDING_PAYMENT' | 'PAID' | 'CANCELED';
+  shipping_status: 'PROCESSING' | 'SHIPPING' | 'SHIPPED';
   snap_token: string;
   snap_redirect_url: string;
   payment_method: CreationOptional<string>;
   created_at: CreationOptional<Date>;
   updated_at: CreationOptional<Date>;
+  user?: NonAttribute<IUser>;
+  products?: NonAttribute<IProduct[]>;
 }
 
 const Transaction = sequelize.define<ITransaction>(
@@ -46,6 +50,10 @@ const Transaction = sequelize.define<ITransaction>(
     },
     status: {
       type: DataTypes.ENUM('PENDING_PAYMENT', 'PAID', 'CANCELED'),
+      allowNull: false,
+    },
+    shipping_status: {
+      type: DataTypes.ENUM('PROCESSING', 'SHIPPING', 'SHIPPED'),
       allowNull: false,
     },
     snap_token: {

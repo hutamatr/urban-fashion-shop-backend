@@ -55,6 +55,8 @@ export async function getRefreshToken(
     );
 
     res.status(200).json({
+      status: 'success',
+      message: 'Access token generated successfully',
       access_token: generatedNewToken,
     });
 

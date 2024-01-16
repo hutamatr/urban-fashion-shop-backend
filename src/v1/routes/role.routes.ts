@@ -6,7 +6,6 @@ import { authMiddleware } from '../../middleware/auth';
 const router = Router();
 
 router.get('/', authMiddleware, getRoles);
-
 router.post('/', authMiddleware, createRole);
 
 export default router;

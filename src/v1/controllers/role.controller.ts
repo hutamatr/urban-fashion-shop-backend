@@ -33,7 +33,11 @@ export async function getRoles(
       throw error;
     }
 
-    res.status(200).json({ roles });
+    res.status(200).json({
+      status: 'success',
+      message: 'Roles retrieved successfully',
+      roles,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -70,6 +74,7 @@ export async function createRole(
     }
 
     res.status(201).json({
+      status: 'success',
       message: 'Create role successfully!',
       role: createdRole.dataValues,
     });

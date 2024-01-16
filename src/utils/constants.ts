@@ -21,9 +21,13 @@ export const firebaseMessagingSenderId =
   process.env.FIREBASE_MESSAGING_SENDER_ID;
 export const firebaseAppId = process.env.FIREBASE_APP_ID;
 export const firebaseMeasurementId = process.env.FIREBASE_MEASUREMENT_ID;
+export const midtransAppURL = process.env.MIDTRANS_APP_URL;
 export const midtransApiURL = process.env.MIDTRANS_API_URL;
 export const midtransServerKey = process.env.MIDTRANS_SERVER_KEY;
 export const PENDING_PAYMENT = 'PENDING_PAYMENT';
 export const PAID = 'PAID';
 export const CANCELED = 'CANCELED';
+export const PROCESSING = 'PROCESSING';
+export const SHIPPING = 'SHIPPING';
+export const SHIPPED = 'SHIPPED';
 export const shippingFlatRate = 15000;

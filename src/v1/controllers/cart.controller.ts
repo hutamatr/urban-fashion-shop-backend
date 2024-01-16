@@ -74,6 +74,8 @@ export async function getCart(req: Request, res: Response, next: NextFunction) {
     });
 
     res.status(200).json({
+      status: 'success',
+      message: 'Cart fetched successfully',
       cart,
       total_quantity: totalQuantity,
       total_products: totalProducts,
@@ -149,6 +151,7 @@ export async function createCart(
       await userCart.save();
 
       res.status(201).json({
+        status: 'success',
         message: 'Add product to cart successfully!',
       });
     } else {
@@ -176,6 +179,7 @@ export async function createCart(
       }
 
       res.status(201).json({
+        status: 'success',
         message: 'Add product to cart successfully!',
       });
     }
@@ -297,8 +301,8 @@ export async function updateCart(
     await userCart.save();
 
     res.status(200).json({
+      status: 'success',
       message: 'Update item to cart successfully!',
-      updated: true,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -387,8 +391,8 @@ export async function deleteCart(
     }
 
     res.status(200).json({
+      status: 'success',
       message: 'Delete product from cart successfully!',
-      deleted: true,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -34,11 +34,21 @@ export async function getUsers(
       throw error;
     }
 
+    const getRole = await Role.findOne({ where: { role_name: 'user' } });
+
+    if (!getRole) {
+      const error: IError = new Error('User role not found, please try again!');
+      error.statusCode = 422;
+      throw error;
+    }
+
+    const userRoleId = getRole.id;
+
     let users;
 
     if (limit > 0 && skip >= 0) {
       users = await User.findAll({
-        where: { role_id: 1 },
+        where: { role_id: userRoleId },
         offset: skip,
         limit: limit,
         attributes: [
@@ -61,7 +71,7 @@ export async function getUsers(
       });
     } else {
       users = await User.findAll({
-        where: { role_id: 1 },
+        where: { role_id: userRoleId },
         attributes: [
           'id',
           'first_name',
@@ -88,9 +98,18 @@ export async function getUsers(
       throw error;
     }
 
-    const total = await User.count({ where: { role_id: 1 } });
+    const total = await User.count({
+      where: { role_id: userRoleId },
+    });
 
-    res.status(200).json({ users, total, skip, limit: users.length });
+    res.status(200).json({
+      status: 'success',
+      message: 'Users fetched successfully',
+      users,
+      total,
+      skip,
+      limit: users.length,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -114,8 +133,16 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.userId;
 
+    const getRole = await Role.findOne({ where: { role_name: 'user' } });
+
+    if (!getRole) {
+      const error: IError = new Error('User role not found, please try again!');
+      error.statusCode = 422;
+      throw error;
+    }
+
     const user = await User.findOne({
-      where: { id: userId },
+      where: { id: userId, role_id: getRole.id },
       attributes: [
         'id',
         'first_name',
@@ -143,7 +170,9 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
       throw error;
     }
 
-    res.status(200).json({ user, message: 'User fetched successfully!' });
+    res
+      .status(200)
+      .json({ status: 'success', message: 'User fetched successfully!', user });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -195,7 +224,9 @@ export async function updateUser(
 
     await user.save();
 
-    res.status(200).json({ user, message: 'User updated successfully!' });
+    res
+      .status(200)
+      .json({ status: 'success', message: 'User updated successfully!', user });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -242,7 +273,7 @@ export async function deleteUser(
 
     res
       .status(200)
-      .json({ deleted: true, message: 'User deleted successfully!' });
+      .json({ status: 'success', message: 'User deleted successfully!' });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

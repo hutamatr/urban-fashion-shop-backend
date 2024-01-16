@@ -28,6 +28,22 @@ declare global {
     };
   }
 
+  interface IUser {
+    id: number;
+    email: string;
+    password: string;
+    first_name: string;
+    last_name: string;
+    city: string;
+    postal_code: string;
+    address: string;
+    phone_number: string;
+    role_id: number;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string;
+  }
+
   interface IMidtransNotification {
     transaction_time: string;
     transaction_status: string;

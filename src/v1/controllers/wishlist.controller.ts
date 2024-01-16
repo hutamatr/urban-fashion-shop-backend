@@ -61,7 +61,11 @@ export async function getWishlists(
       throw error;
     }
 
-    res.status(200).json({ wishlists: wishlists });
+    res.status(200).json({
+      status: 'success',
+      message: 'Wishlists retrieved successfully',
+      wishlists: wishlists,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
@@ -114,7 +118,11 @@ export async function getWishlist(
       throw error;
     }
 
-    res.status(200).json({ wishlist: wishlist });
+    res.status(200).json({
+      status: 'success',
+      message: 'Wishlist retrieved successfully',
+      wishlist: wishlist,
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     errorHandler(error, 'Failed to create wishlist, try again later!', next);
@@ -182,6 +190,7 @@ export async function createWishlist(
     });
 
     res.status(201).json({
+      status: 'success',
       message: 'Create wishlist successfully!',
       wishlist: wishlistData,
     });
@@ -227,6 +236,7 @@ export async function deleteWishlist(
     }
 
     res.status(200).json({
+      status: 'success',
       message: 'Delete wishlist successfully!',
     });
 

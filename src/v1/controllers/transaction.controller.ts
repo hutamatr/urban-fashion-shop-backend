@@ -8,16 +8,24 @@ import Product from '../models/product.model';
 import Transaction, { ITransaction } from '../models/transaction.model';
 import TransactionItem from '../models/transaction-item.model';
 import User from '../models/user.model';
+import { sequelize } from '../../database/db';
 import {
   CANCELED,
   feBaseURL,
   midtransApiURL,
+  midtransAppURL,
   midtransServerKey,
   PAID,
   PENDING_PAYMENT,
+  PROCESSING,
+  SHIPPING,
   shippingFlatRate,
 } from '../../utils/constants';
 import errorHandler from '../../utils/error-handler';
+
+async function sequelizeTransaction() {
+  return await sequelize.transaction();
+}
 
 /**
  * The `createTransaction` function creates a transaction for a user, including updating user
@@ -47,8 +55,11 @@ export async function createTransaction(
     const postalCode = req.body.postal_code;
     const authString = btoa(`${midtransServerKey}:`);
 
+    const t = await sequelizeTransaction();
+
     const user = await User.findOne({
       where: { id: userId },
+      transaction: t,
     });
 
     if (!user) {
@@ -66,7 +77,7 @@ export async function createTransaction(
       postal_code: postalCode,
     });
 
-    await user.save();
+    await user.save({ transaction: t });
 
     const userCart = await Cart.findOne({
       where: { user_id: userId },
@@ -88,6 +99,7 @@ export async function createTransaction(
           },
         },
       ],
+      transaction: t,
     });
 
     if (!userCart) {
@@ -98,6 +110,7 @@ export async function createTransaction(
 
     const userCartItem = await CartItem.findAll({
       where: { cart_id: userCart.dataValues.id },
+      transaction: t,
     });
 
     if (!userCartItem) {
@@ -171,7 +184,7 @@ export async function createTransaction(
       },
     };
 
-    const response = await fetch(`${midtransApiURL}/snap/v1/transactions`, {
+    const response = await fetch(`${midtransAppURL}/snap/v1/transactions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -189,15 +202,25 @@ export async function createTransaction(
 
     const data: IMidtransResponse = await response.json();
 
-    const transaction = await Transaction.create({
-      id: transaction_id,
-      user_id: userId as number,
-      total_price: gross_amount,
-      status: PENDING_PAYMENT,
-      snap_token: data.token,
-      snap_redirect_url: data.redirect_url,
-      payment_method: 'Midtrans',
-    });
+    if (!data?.token) {
+      const error: IError = new Error('Failed to create transaction!');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const transaction = await Transaction.create(
+      {
+        id: transaction_id,
+        user_id: userId as number,
+        total_price: gross_amount,
+        status: PENDING_PAYMENT,
+        shipping_status: PROCESSING,
+        snap_token: data.token,
+        snap_redirect_url: data.redirect_url,
+        payment_method: 'Midtrans',
+      },
+      { transaction: t }
+    );
 
     if (!transaction?.id) {
       const error: IError = new Error('Failed to create transaction!');
@@ -205,35 +228,72 @@ export async function createTransaction(
       throw error;
     }
 
-    userCart.products?.forEach(async (item) => {
-      await TransactionItem.create({
-        transaction_id,
-        product_id: item.id,
-        quantity: item.cart_item.quantity,
-      });
+    const transactionItemsData = userCart.products!.map((product) => ({
+      transaction_id: transaction_id,
+      product_id: product.id,
+      quantity: product.cart_item.quantity,
+    }));
+
+    const transactionItemsCreate = await TransactionItem.bulkCreate(
+      transactionItemsData,
+      { transaction: t, validate: true }
+    );
+
+    if (!transactionItemsCreate) {
+      const error: IError = new Error('Failed to create transaction!');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    await userCart.destroy({ transaction: t });
+    userCartItem.forEach(async (item) => {
+      await item.destroy({ transaction: t });
     });
 
-    await userCart.destroy();
-    userCartItem.forEach(async (item) => {
-      await item.destroy();
+    const transactionItems = await Transaction.findOne({
+      where: { id: transaction_id, user_id: userId },
+      include: {
+        model: Product,
+        as: 'products',
+        attributes: [
+          'id',
+          'title',
+          'image_url',
+          'price',
+          'discount_percentage',
+          'discounted_price',
+        ],
+        through: {
+          attributes: ['quantity'],
+        },
+      },
+      transaction: t,
     });
+
+    await t.commit();
 
     res.status(201).json({
       status: 'success',
       message: 'Transaction created successfully',
-      data: {
+      transaction: {
         id: transaction_id,
         status: PENDING_PAYMENT,
         first_name: firstName,
         last_name: lastName,
-        products: userCart.products,
+        email: user.email,
+        products: transactionItems?.products,
         snap_token: data.token,
         snap_redirect_url: data.redirect_url,
+        payment_method: transaction.payment_method,
+        created_at: transaction.created_at,
       },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
+    const t = await sequelizeTransaction();
+    await t.rollback();
+
     errorHandler(error, error.message, next);
   }
 }
@@ -257,7 +317,7 @@ export async function getTransactions(
 ) {
   try {
     const isAdmin = req.isAdmin;
-    const statusTransaction = req.body.status;
+    const statusTransaction = req.params.status;
 
     if (!isAdmin) {
       const error: IError = new Error('Not authorized!');
@@ -269,18 +329,6 @@ export async function getTransactions(
       where: {
         status: statusTransaction,
       },
-      include: [
-        {
-          model: TransactionItem,
-          attributes: ['id', 'quantity', 'created_at', 'updated_at'],
-          include: [
-            {
-              model: Product,
-              attributes: ['id', 'title', 'image_url', 'price'],
-            },
-          ],
-        },
-      ],
     });
 
     if (!transactions) {
@@ -292,9 +340,39 @@ export async function getTransactions(
     res.status(200).json({
       status: 'success',
       message: 'Transactions fetched successfully',
-      data: transactions,
+      transaction: transactions,
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    errorHandler(error, 'Failed to get transaction, try again later!', next);
+  }
+}
+
+export async function getAllTransactionByUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = req.userId;
+
+    const transaction = await Transaction.findAll({
+      where: { user_id: userId },
+      order: [['created_at', 'DESC']],
+    });
+
+    if (transaction.length === 0) {
+      const error: IError = new Error('Transaction not found!');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Transaction fetched successfully',
+      transaction: transaction,
+    });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     errorHandler(error, 'Failed to get transaction, try again later!', next);
@@ -320,20 +398,29 @@ export async function getTransactionById(
 ) {
   try {
     const userId = req.userId;
-    const transactionId = req.params.transaction_id;
+    const transactionId = req.params.transactionId;
 
     const transaction = await Transaction.findOne({
       where: { id: transactionId, user_id: userId },
       include: [
         {
-          model: TransactionItem,
-          attributes: ['id', 'quantity', 'created_at', 'updated_at'],
-          include: [
-            {
-              model: Product,
-              attributes: ['id', 'title', 'image_url', 'price'],
-            },
+          model: User,
+          attributes: ['id', 'first_name', 'last_name', 'email'],
+        },
+        {
+          model: Product,
+          as: 'products',
+          attributes: [
+            'id',
+            'title',
+            'image_url',
+            'price',
+            'discount_percentage',
+            'discounted_price',
           ],
+          through: {
+            attributes: ['quantity'],
+          },
         },
       ],
     });
@@ -347,7 +434,18 @@ export async function getTransactionById(
     res.status(200).json({
       status: 'success',
       message: 'Transaction fetched successfully',
-      data: transaction,
+      transaction: {
+        id: transaction.id,
+        status: transaction.status,
+        first_name: transaction.user?.first_name,
+        last_name: transaction.user?.last_name,
+        email: transaction.user?.email,
+        snap_token: transaction.snap_token,
+        snap_redirect_url: transaction.snap_redirect_url,
+        payment_method: transaction.payment_method,
+        products: transaction.products,
+        created_at: transaction.created_at,
+      },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -376,6 +474,7 @@ export async function updateTransactionStatus(
   try {
     const transactionId = req.params.transaction_id;
     const status = req.body.status;
+    const shippingStatus = req.body.shipping_status;
 
     const transaction = await Transaction.findOne({
       where: { id: transactionId },
@@ -387,19 +486,64 @@ export async function updateTransactionStatus(
       throw error;
     }
 
-    transaction.set({ status });
+    transaction.set({ status, shipping_status: shippingStatus });
 
     await transaction.save();
 
     res.status(200).json({
       status: 'success',
       message: 'Transaction status updated successfully',
-      data: transaction,
+      transaction: transaction,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     errorHandler(error, 'Failed to update transaction, try again later!', next);
+  }
+}
+
+export async function deleteTransactionFromDB(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const transactionId = req.params.transactionId;
+    const t = await sequelizeTransaction();
+
+    const transaction = await Transaction.findOne({
+      where: { id: transactionId },
+      transaction: t,
+    });
+
+    if (!transaction) {
+      const error: IError = new Error('Transaction not found!');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const transactionItems = await TransactionItem.findAll({
+      where: { transaction_id: transactionId },
+      transaction: t,
+    });
+
+    await transaction.destroy({ transaction: t });
+    transactionItems.forEach(
+      async (item) => await item.destroy({ transaction: t })
+    );
+
+    await t.commit();
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Transaction deleted successfully',
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    const t = await sequelizeTransaction();
+    await t.rollback();
+    errorHandler(error, 'Failed to delete transaction, try again later!', next);
   }
 }
 
@@ -438,10 +582,18 @@ async function updateStatusByMidtrans(
 
   if (transactionStatus == 'capture') {
     if (fraudStatus == 'accept') {
-      transaction.set({ status: PAID, payment_method: data?.payment_type });
+      transaction.set({
+        status: PAID,
+        shipping_status: SHIPPING,
+        payment_method: data?.payment_type,
+      });
     }
   } else if (transactionStatus == 'settlement') {
-    transaction.set({ status: PAID, payment_method: data?.payment_type });
+    transaction.set({
+      status: PAID,
+      shipping_status: SHIPPING,
+      payment_method: data?.payment_type,
+    });
   } else if (
     transactionStatus == 'cancel' ||
     transactionStatus == 'deny' ||
@@ -495,4 +647,70 @@ export async function transactionNotification(
     status: 'success',
     message: 'OK',
   });
+}
+
+export async function cancelTransaction(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const transactionId = req.body.transaction_id;
+    const authString = btoa(`${midtransServerKey}:`);
+    const t = await sequelizeTransaction();
+
+    const response = await fetch(
+      `${midtransApiURL}/v2/${transactionId}/cancel`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Basic ${authString}`,
+        },
+      }
+    );
+
+    if (response.status !== 200) {
+      const error: IError = new Error(await response.text());
+      error.statusCode = response.status;
+      throw error;
+    }
+
+    const data = await response.json();
+
+    if (parseInt(data?.status_code) >= 400) {
+      const error: IError = new Error(data.status_message);
+      error.statusCode = data.status_code;
+      throw error;
+    }
+
+    const transaction = await Transaction.findOne({
+      where: { id: transactionId },
+      transaction: t,
+    });
+
+    if (!transaction) {
+      const error: IError = new Error('Transaction not found!');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    transaction.set({ status: CANCELED });
+
+    await transaction.save({ transaction: t });
+
+    await t.commit();
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Transaction canceled successfully',
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    const t = await sequelizeTransaction();
+    await t.rollback();
+    errorHandler(error, 'Failed to update transaction, try again later!', next);
+  }
 }
