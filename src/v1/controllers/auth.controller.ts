@@ -359,6 +359,7 @@ export async function resetPasswordLinkHandler(
     res.status(200).json({
       status: 'success',
       message: 'Reset password link sent to your email!',
+      token: resetPasswordToken.dataValues.token,
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
