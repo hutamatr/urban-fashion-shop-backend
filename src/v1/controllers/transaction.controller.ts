@@ -236,7 +236,7 @@ export async function createTransaction(
 
     const transactionItemsCreate = await TransactionItem.bulkCreate(
       transactionItemsData,
-      { transaction: t, validate: true }
+      { transaction: t }
     );
 
     if (!transactionItemsCreate) {
@@ -316,8 +316,8 @@ export async function getTransactions(
   next: NextFunction
 ) {
   try {
-    const isAdmin = req.isAdmin;
     const statusTransaction = req.params.status;
+    const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
       const error: IError = new Error('Not authorized!');
@@ -472,9 +472,16 @@ export async function updateTransactionStatus(
   next: NextFunction
 ) {
   try {
-    const transactionId = req.params.transaction_id;
+    const transactionId = req.params.transactionId;
     const status = req.body.status;
     const shippingStatus = req.body.shipping_status;
+    const isAdmin = req.isAdmin;
+
+    if (!isAdmin) {
+      const error: IError = new Error('Not authorized!');
+      error.statusCode = 401;
+      throw error;
+    }
 
     const transaction = await Transaction.findOne({
       where: { id: transactionId },
@@ -509,11 +516,16 @@ export async function deleteTransactionFromDB(
 ) {
   try {
     const transactionId = req.params.transactionId;
-    const t = await sequelizeTransaction();
+    const isAdmin = req.isAdmin;
+
+    if (!isAdmin) {
+      const error: IError = new Error('Not authorized!');
+      error.statusCode = 401;
+      throw error;
+    }
 
     const transaction = await Transaction.findOne({
       where: { id: transactionId },
-      transaction: t,
     });
 
     if (!transaction) {
@@ -524,15 +536,10 @@ export async function deleteTransactionFromDB(
 
     const transactionItems = await TransactionItem.findAll({
       where: { transaction_id: transactionId },
-      transaction: t,
     });
 
-    await transaction.destroy({ transaction: t });
-    transactionItems.forEach(
-      async (item) => await item.destroy({ transaction: t })
-    );
-
-    await t.commit();
+    await transaction.destroy();
+    transactionItems.forEach(async (item) => await item.destroy());
 
     res.status(200).json({
       status: 'success',
@@ -541,8 +548,6 @@ export async function deleteTransactionFromDB(
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    const t = await sequelizeTransaction();
-    await t.rollback();
     errorHandler(error, 'Failed to delete transaction, try again later!', next);
   }
 }

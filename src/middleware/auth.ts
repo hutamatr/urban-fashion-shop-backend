@@ -56,9 +56,23 @@ export async function authMiddleware(
     req.user = user;
     req.userId = credential.id;
 
+    let roleId;
+
     const getRoles = await Role.findOne({ where: { role_name: 'admin' } });
 
-    if (user?.dataValues.role_id === getRoles?.dataValues.id) {
+    if (!getRoles) {
+      const createRole = await Role.create({ role_name: 'admin' });
+      if (!createRole) {
+        const error: IError = new Error('Failed to create role!');
+        error.statusCode = 422;
+        throw error;
+      }
+      roleId = createRole.dataValues.id;
+    } else {
+      roleId = getRoles?.dataValues?.id;
+    }
+
+    if (user?.dataValues.role_id === roleId) {
       req.isAdmin = true;
     }
 
