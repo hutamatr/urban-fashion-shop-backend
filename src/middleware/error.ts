@@ -33,5 +33,5 @@ export default function errorMiddleware(
 
   res
     .status(status as number)
-    .json({ error: true, statusCode: status, message });
+    .json({ status: 'error', statusCode: status, message });
 }
