@@ -9,10 +9,10 @@
     "node": ">= 18"
   },
   "scripts": {
+    "start": "NODE_ENV=production node build/src/server.js",
     "dev": "concurrently \"set NODE_ENV=development\" \"npx tsc --watch\" \"nodemon build/src/server.js\"",
-    "start": "node build/src/server.js",
-    "build:dev": "rm -rf build/ && set NODE_ENV=development && tsc --build",
     "build": "rm -rf build/ && set NODE_ENV=production && tsc --build",
+    "build:dev": "rm -rf build/ && set NODE_ENV=development && tsc --build",
     "test": "NODE_ENV=test jest --runInBand",
     "lint": "eslint . --ext js,ts --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --fix && yarn format",
@@ -70,7 +70,7 @@
     "babel-jest": "^29.7.0",
     "babel-preset-env": "^1.7.0",
     "concurrently": "^8.2.2",
-    "eslint": "^9.1.0",
+    "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-simple-import-sort": "^12.1.0",
     "eslint-plugin-unused-imports": "^3.1.0",

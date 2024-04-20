@@ -7,6 +7,7 @@ import User from '../models/user.model';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
+  env,
   feBaseURL,
   refreshTokenExpiredIn,
   refreshTokenSecret,
@@ -102,7 +103,7 @@ export async function signUpUserHandler(
     res.cookie('rt', refreshToken, {
       httpOnly: true,
       sameSite: 'strict',
-      secure: false,
+      secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -186,7 +187,7 @@ export async function signInUserHandler(
     res.cookie('rt', refreshToken, {
       httpOnly: true,
       sameSite: 'strict',
-      secure: false,
+      secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -238,7 +239,7 @@ export async function signOutHandler(
     res.clearCookie('rt', {
       httpOnly: true,
       sameSite: 'strict',
-      secure: false,
+      secure: env === 'production',
     });
 
     res
