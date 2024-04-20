@@ -1,10 +1,14 @@
 import cors from 'cors';
 
+import { adminBaseURL, feBaseURL, host } from './constants';
+
 const whitelist = [
-  'http://localhost:5173',
+  `http://${host}:5173`,
+  `http://${host}:3000`,
   'http://127.0.0.1:5173',
-  'http://localhost:3000',
   'http://127.0.0.1:3000',
+  feBaseURL as string,
+  adminBaseURL as string,
 ];
 /**
  * The `corsMiddleware` function returns a middleware function that handles Cross-Origin Resource
