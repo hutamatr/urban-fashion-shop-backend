@@ -102,6 +102,7 @@ export async function signUpUserHandler(
 
     res.cookie('rt', refreshToken, {
       httpOnly: true,
+      sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -185,6 +186,7 @@ export async function signInUserHandler(
 
     res.cookie('rt', refreshToken, {
       httpOnly: true,
+      sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -236,6 +238,7 @@ export async function signOutHandler(
 
     res.clearCookie('rt', {
       httpOnly: true,
+      sameSite: 'none',
       secure: env === 'production',
     });
 
