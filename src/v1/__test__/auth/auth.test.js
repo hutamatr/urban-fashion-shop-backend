@@ -37,7 +37,7 @@ describe('Auth Test Cases', () => {
 
   test('should return 200 status code when password changed successfully', async () => {
     const res = await request(app)
-      .post(`${domain}/change-password`)
+      .post(`${domain}/change-password/${userId}`)
       .send({
         current_password: password,
         new_password: 'newPassword123!',
