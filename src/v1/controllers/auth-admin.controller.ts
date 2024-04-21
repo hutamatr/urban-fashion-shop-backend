@@ -94,6 +94,7 @@ export async function signUpAdminHandler(
 
     res.cookie('rt', refreshToken, {
       httpOnly: true,
+      sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -183,6 +184,7 @@ export async function signInAdminHandler(
 
     res.cookie('rt', refreshToken, {
       httpOnly: true,
+      sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
