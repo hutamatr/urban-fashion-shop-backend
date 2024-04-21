@@ -5,6 +5,7 @@ import User from '../models/user.model';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
+  adminBaseURL,
   adminCode,
   env,
   refreshTokenExpiredIn,
@@ -97,6 +98,8 @@ export async function signUpAdminHandler(
       sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: env === 'production' ? adminBaseURL : 'localhost',
+      path: '/',
     });
 
     res.status(201).json({
@@ -187,6 +190,8 @@ export async function signInAdminHandler(
       sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+      domain: env === 'production' ? adminBaseURL : 'localhost',
     });
 
     res.status(200).json({

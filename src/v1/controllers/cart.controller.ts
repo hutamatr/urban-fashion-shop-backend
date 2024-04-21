@@ -23,9 +23,13 @@ interface IRequestBody {
  * next middleware function in the request-response cycle. It is typically used to handle errors or to
  * move on to the next middleware function in the chain.
  */
-export async function getCart(req: Request, res: Response, next: NextFunction) {
+export async function getCartByUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const userId = req.userId;
+    const userId = req.params?.userId;
 
     const cart = await Cart.findOne({
       where: { user_id: userId },

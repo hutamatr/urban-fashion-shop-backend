@@ -131,7 +131,7 @@ export async function getUsers(
  */
 export async function getUser(req: Request, res: Response, next: NextFunction) {
   try {
-    const userId = req.userId;
+    const userId = req.params?.userId;
 
     const getRole = await Role.findOne({ where: { role_name: 'user' } });
 
@@ -199,7 +199,7 @@ export async function updateUser(
   next: NextFunction
 ) {
   try {
-    const userId = req.userId;
+    const userId = req.params?.userId;
     const firstName = req.body.first_name;
     const lastName = req.body.last_name;
     const address = req.body.address;
@@ -252,7 +252,7 @@ export async function deleteUser(
   next: NextFunction
 ) {
   try {
-    const userId = req.params.userId;
+    const userId = req.params?.userId;
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
