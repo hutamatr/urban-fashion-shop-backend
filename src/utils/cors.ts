@@ -2,7 +2,7 @@ import cors from 'cors';
 
 import { adminBaseURL, feBaseURL, host } from './constants';
 
-const whitelist = [
+export const allowedOrigins = [
   `${host}:5173`,
   `${host}:3000`,
   'http://127.0.0.1:5173',
@@ -17,13 +17,17 @@ const whitelist = [
  */
 export default function corsMiddleware() {
   return cors({
-    origin: whitelist,
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
     allowedHeaders: [
-      'Access-Control-Allow-Headers',
       'Content-Type',
       'Authorization',
+      'Access-Control-Allow-Headers',
+      'Access-Control-Allow-Origin',
+      'Access-Control-Allow-Credentials',
+      'Access-Control-Allow-Methods',
     ],
     credentials: true,
+    optionsSuccessStatus: 200,
   });
 }

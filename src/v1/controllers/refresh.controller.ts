@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
+import User from '../models/user.model';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
@@ -26,13 +27,15 @@ export async function getRefreshToken(
   next: NextFunction
 ) {
   try {
-    const refreshToken = req.cookies.rt;
+    const cookies = req.cookies;
 
-    if (!refreshToken) {
+    if (!cookies?.rt) {
       const error: IError = new Error('Not Authenticated');
       error.statusCode = 401;
       throw error;
     }
+
+    const refreshToken = cookies.rt;
 
     const verifiedToken = await verifyToken(
       refreshToken,
@@ -45,10 +48,20 @@ export async function getRefreshToken(
       throw error;
     }
 
-    const generatedNewToken = await generateToken(
+    const user = await User.findOne({
+      where: { email: verifiedToken?.email, id: verifiedToken?.id },
+    });
+
+    if (verifiedToken?.email !== user?.email) {
+      const error: IError = new Error('User does not exist');
+      error.statusCode = 401;
+      throw error;
+    }
+
+    const generatedAccessToken = await generateToken(
       {
-        id: verifiedToken.id,
-        email: verifiedToken.email,
+        id: user?.id,
+        email: user?.email,
       },
       accessTokenSecret as string,
       accessTokenExpiresIn
@@ -57,7 +70,7 @@ export async function getRefreshToken(
     res.status(200).json({
       status: 'success',
       message: 'Access token generated successfully',
-      access_token: generatedNewToken,
+      access_token: generatedAccessToken,
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
