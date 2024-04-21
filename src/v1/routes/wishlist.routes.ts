@@ -4,13 +4,13 @@ import {
   createWishlist,
   deleteWishlist,
   getWishlist,
-  getWishlists,
+  getWishlistsByUser,
 } from '../controllers/wishlist.controller';
 import { authMiddleware } from '../../middleware/auth';
 
 const router = Router();
 
-router.get('/', authMiddleware, getWishlists);
+router.get('/:userId', authMiddleware, getWishlistsByUser);
 
 router.get('/:productId', authMiddleware, getWishlist);
 

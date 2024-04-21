@@ -12,7 +12,7 @@ const router = Router();
 
 router.get('/', authMiddleware, getUsers);
 router.get('/:userId', authMiddleware, getUser);
-router.put('/', authMiddleware, updateUser);
+router.put('/:userId', authMiddleware, updateUser);
 router.delete('/:userId', authMiddleware, deleteUser);
 
 export default router;

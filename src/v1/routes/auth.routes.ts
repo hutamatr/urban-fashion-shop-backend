@@ -35,7 +35,7 @@ router.post('/admin/signup', validate(signUpValidation), signUpAdminHandler);
 router.post('/admin/signin', validate(signInValidation), signInAdminHandler);
 
 router.post(
-  '/change-password',
+  '/change-password/:userId',
   authMiddleware,
   validate(changePasswordValidation),
   changePasswordHandler
