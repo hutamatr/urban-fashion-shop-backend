@@ -13,6 +13,7 @@ import { sequelize } from '../../../database/db';
 
 let userToken;
 let productId;
+let userId;
 
 describe('Wishlist Test Cases', () => {
   // Before any tests run, clear the DB and run migrations with Sequelize sync()
@@ -27,6 +28,7 @@ describe('Wishlist Test Cases', () => {
     );
     userToken = createUserAcc.body?.access_token;
     productId = createProduct.body?.product?.id;
+    userId = createUserAcc.body?.user?.id;
   });
 
   test('should return 201 status code when create new wishlist with valid data', async () => {
@@ -41,9 +43,9 @@ describe('Wishlist Test Cases', () => {
     expect(res.statusCode).toBe(201);
   });
 
-  test('should return 200 status code when get all wishlists', async () => {
+  test('should return 200 status code when get all wishlists by user', async () => {
     const res = await request(app)
-      .get(`${domain}/wishlists`)
+      .get(`${domain}/wishlists/${userId}`)
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
       .auth(userToken, { type: 'bearer' });

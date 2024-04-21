@@ -42,7 +42,7 @@ describe('User Test Cases', () => {
 
   test('should return 200 status code when update user profile', async () => {
     const res = await request(app)
-      .put(`${domain}/users`)
+      .put(`${domain}/users/${userId}`)
       .send({
         first_name: faker.person.firstName(),
         last_name: faker.person.lastName(),
