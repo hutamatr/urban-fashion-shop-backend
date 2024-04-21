@@ -20,7 +20,7 @@ interface IRequestBody {
  * next middleware function in the request-response cycle. It is typically used to handle errors or to
  * move on to the next middleware function after completing the current one.
  */
-export async function getWishlists(
+export async function getWishlistsByUser(
   req: Request,
   res: Response,
   next: NextFunction

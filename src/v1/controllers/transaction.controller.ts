@@ -178,9 +178,9 @@ export async function createTransaction(
         },
       },
       callbacks: {
-        finish: `${feBaseURL}/order-status?transaction_id=${transaction_id}`,
-        error: `${feBaseURL}/order-status?transaction_id=${transaction_id}`,
-        pending: `${feBaseURL}/order-status?transaction_id=${transaction_id}`,
+        finish: `https://${feBaseURL}/order-status?transaction_id=${transaction_id}`,
+        error: `https://${feBaseURL}/order-status?transaction_id=${transaction_id}`,
+        pending: `https://${feBaseURL}/order-status?transaction_id=${transaction_id}`,
       },
     };
 

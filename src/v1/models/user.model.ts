@@ -65,7 +65,6 @@ const User = sequelize.define<IUser>(
       type: DataTypes.TEXT,
       allowNull: true,
     },
-
     phone_number: {
       type: DataTypes.STRING(255),
       allowNull: true,

@@ -105,6 +105,8 @@ export async function signUpUserHandler(
       sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: env === 'production' ? feBaseURL : 'localhost',
+      path: '/',
     });
 
     res.status(201).json({
@@ -189,6 +191,8 @@ export async function signInUserHandler(
       sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      domain: env === 'production' ? feBaseURL : 'localhost',
+      path: '/',
     });
 
     res.status(200).json({
@@ -269,7 +273,7 @@ export async function changePasswordHandler(
   next: NextFunction
 ) {
   try {
-    const userId = req.userId;
+    const userId = req.params?.userId;
     const currentPassword = req.body.current_password;
     const newPassword = req.body.new_password;
 
@@ -290,7 +294,7 @@ export async function changePasswordHandler(
 
     if (!verifyCurrentPassword) {
       const error: IError = new Error('Incorrect Password!');
-      error.statusCode = 401;
+      error.statusCode = 400;
       throw error;
     }
 
@@ -354,7 +358,7 @@ export async function resetPasswordLinkHandler(
       });
     }
 
-    const link = `${feBaseURL}/reset-password/${user.dataValues.id}/${resetPasswordToken.dataValues.token}`;
+    const link = `https://${feBaseURL}/reset-password/${user.dataValues.id}/${resetPasswordToken.dataValues.token}`;
     await sendEmail(user.dataValues.email, 'Reset Password', link);
 
     res.status(200).json({
@@ -392,8 +396,8 @@ export async function resetPasswordHandler(
   next: NextFunction
 ) {
   try {
-    const userId = req.params.userId;
-    const resetPasswordToken = req.params.token;
+    const userId = req.params?.userId;
+    const resetPasswordToken = req.params?.token;
     const newPassword = req.body.new_password;
 
     const user = await User.findOne({
