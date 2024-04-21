@@ -37,7 +37,7 @@ export async function getUsers(
     const getRole = await Role.findOne({ where: { role_name: 'user' } });
 
     if (!getRole) {
-      const error: IError = new Error('User role not found, please try again!');
+      const error: IError = new Error('Users empty, please try again!');
       error.statusCode = 422;
       throw error;
     }
