@@ -9,6 +9,7 @@ import {
   accessTokenSecret,
   env,
   feBaseURL,
+  feDomain,
   refreshTokenExpiredIn,
   refreshTokenSecret,
 } from '../../utils/constants';
@@ -105,8 +106,7 @@ export async function signUpUserHandler(
       sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: env === 'production' ? feBaseURL : 'localhost',
-      path: '/',
+      domain: env === 'production' ? feDomain : 'localhost',
     });
 
     res.status(201).json({
@@ -191,8 +191,7 @@ export async function signInUserHandler(
       sameSite: 'none',
       secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: env === 'production' ? feBaseURL : 'localhost',
-      path: '/',
+      domain: env === 'production' ? feDomain : 'localhost',
     });
 
     res.status(200).json({
@@ -358,7 +357,7 @@ export async function resetPasswordLinkHandler(
       });
     }
 
-    const link = `https://${feBaseURL}/reset-password/${user.dataValues.id}/${resetPasswordToken.dataValues.token}`;
+    const link = `${feBaseURL}/reset-password/${user.dataValues.id}/${resetPasswordToken.dataValues.token}`;
     await sendEmail(user.dataValues.email, 'Reset Password', link);
 
     res.status(200).json({
