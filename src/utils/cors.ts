@@ -7,8 +7,8 @@ export const allowedOrigins = [
   `${host}:3000`,
   'http://127.0.0.1:5173',
   'http://127.0.0.1:3000',
-  `https://${feBaseURL}`,
-  `https://${adminBaseURL}`,
+  feBaseURL as string,
+  adminBaseURL as string,
 ];
 /**
  * The `corsMiddleware` function returns a middleware function that handles Cross-Origin Resource

@@ -16,6 +16,8 @@ export const service = process.env.SERVICE;
 
 export const feBaseURL = process.env.FE_BASE_URL;
 export const adminBaseURL = process.env.ADMIN_BASE_URL;
+export const feDomain = process.env.FE_DOMAIN;
+export const adminDomain = process.env.ADMIN_DOMAIN;
 
 export const dbNameDevelopment = process.env.DB_NAME_DEVELOPMENT;
 export const dbNameTest = process.env.DB_NAME_TEST;
