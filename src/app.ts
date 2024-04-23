@@ -6,12 +6,13 @@ import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import multer from 'multer';
 
-import association from './database/association';
 import errorMiddleware from './middleware/error';
+import morganMiddleware from './middleware/log';
 import corsMiddleware from './utils/cors';
 import { credentials } from './utils/credentials';
 import errorHandler from './utils/error-handler';
 import limiter from './utils/rate-limiter';
+import association from './v1/models/association';
 import authRoutes from './v1/routes/auth.routes';
 import cartRoutes from './v1/routes/cart.routes';
 import categoryRoutes from './v1/routes/category.routes';
@@ -33,7 +34,7 @@ app.use(corsMiddleware());
 app.use(cookieParser());
 app.use(compression());
 app.use(helmet());
-// app.use(logger());
+app.use(morganMiddleware);
 app.use(limiter);
 
 app.use('/api/v1/products', productRoutes);
