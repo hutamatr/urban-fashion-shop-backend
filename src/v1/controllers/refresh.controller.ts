@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 
+import RefreshToken from '../models/refresh-token.model';
 import User from '../models/user.model';
 import {
   accessTokenExpiresIn,
@@ -7,7 +9,7 @@ import {
   refreshTokenSecret,
 } from '../../utils/constants';
 import errorHandler from '../../utils/error-handler';
-import { generateToken, verifyToken } from '../../utils/jwt';
+import { generateToken } from '../../utils/jwt';
 
 /**
  * The function `getRefreshToken` is an asynchronous function that handles the retrieval and
@@ -35,43 +37,113 @@ export async function getRefreshToken(
       throw error;
     }
 
-    const refreshToken = cookies.rt;
+    const refreshTokenCookie = cookies.rt;
 
-    const verifiedToken = await verifyToken(
-      refreshToken,
-      refreshTokenSecret as string
-    );
+    res.clearCookie('rt', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
 
-    if (!verifiedToken) {
-      const error: IError = new Error('Refresh token expired or invalid');
-      error.statusCode = 401;
+    const refreshTokenUser = await RefreshToken.findOne({
+      where: { refresh_token: refreshTokenCookie },
+    });
+
+    // Detected refresh token reuse
+    if (!refreshTokenUser) {
+      jwt.verify(
+        refreshTokenCookie,
+        refreshTokenSecret as string,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async (err: jwt.VerifyErrors | null, decoded: any) => {
+          if (err) {
+            const error: IError = new Error('Token expired or invalid');
+            error.statusCode = 403;
+            throw error;
+          }
+          const user = await User.findOne({
+            where: { email: decoded?.email },
+          });
+
+          if (!user) {
+            const error: IError = new Error('User does not exist');
+            error.statusCode = 401;
+            throw error;
+          }
+
+          await RefreshToken.destroy({ where: { user_id: user?.id } });
+        }
+      );
+      const error: IError = new Error('Token expired or invalid');
+      error.statusCode = 403;
       throw error;
     }
 
     const user = await User.findOne({
-      where: { email: verifiedToken?.email, id: verifiedToken?.id },
+      where: { id: refreshTokenUser?.dataValues?.user_id },
     });
 
-    if (verifiedToken?.email !== user?.email) {
+    if (!user) {
       const error: IError = new Error('User does not exist');
       error.statusCode = 401;
       throw error;
     }
 
-    const generatedAccessToken = await generateToken(
-      {
-        id: user?.id,
-        email: user?.email,
-      },
-      accessTokenSecret as string,
-      accessTokenExpiresIn
-    );
+    // Generate new access token and refresh token
+    jwt.verify(
+      refreshTokenUser.refresh_token,
+      refreshTokenSecret as string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      async (err: jwt.VerifyErrors | null, decoded: any) => {
+        if (err) {
+          await RefreshToken.destroy({
+            where: {
+              user_id: user?.id,
+              refresh_token: refreshTokenCookie,
+            },
+          });
+        }
 
-    res.status(200).json({
-      status: 'success',
-      message: 'Access token generated successfully',
-      access_token: generatedAccessToken,
-    });
+        if (err || user.email !== decoded?.email) {
+          const error: IError = new Error('User does not exist');
+          error.statusCode = 401;
+          throw error;
+        }
+
+        const newAccessToken = await generateToken(
+          {
+            id: user?.id,
+            email: decoded?.email,
+          },
+          accessTokenSecret as string,
+          accessTokenExpiresIn
+        );
+
+        const newRefreshToken = await generateToken(
+          { email: decoded?.email },
+          refreshTokenSecret as string,
+          accessTokenExpiresIn
+        );
+
+        await RefreshToken.create({
+          user_id: user?.id,
+          refresh_token: newRefreshToken,
+        });
+
+        res.cookie('rt', newRefreshToken, {
+          httpOnly: true,
+          sameSite: 'none',
+          secure: true,
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        res.status(200).json({
+          status: 'success',
+          message: 'Access token generated successfully',
+          access_token: newAccessToken,
+        });
+      }
+    );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
