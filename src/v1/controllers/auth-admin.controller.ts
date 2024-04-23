@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 
+import RefreshToken from '../models/refresh-token.model';
 import Role from '../models/role.model';
 import User from '../models/user.model';
 import {
@@ -52,6 +53,7 @@ export async function signUpAdminHandler(
 
     const hashedPassword = await hashPassword(password);
     let roleId;
+
     const getRoles = await Role.findOne({ where: { role_name: 'admin' } });
     roleId = getRoles?.dataValues?.id;
 
@@ -93,10 +95,15 @@ export async function signUpAdminHandler(
       refreshTokenExpiredIn
     );
 
+    await RefreshToken.create({
+      refresh_token: refreshToken,
+      user_id: id,
+    });
+
     res.cookie('rt', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: env === 'production',
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       domain: env === 'production' ? adminDomain : 'localhost',
     });
@@ -136,12 +143,17 @@ export async function signInAdminHandler(
   next: NextFunction
 ) {
   try {
+    const cookies = req.cookies;
     const email = req.body.email;
     const password = req.body.password;
 
-    const admin = await User.findOne({ where: { email } });
-
     const getRoles = await Role.findOne({ where: { role_name: 'admin' } });
+
+    const adminRoleId = getRoles?.dataValues.id;
+
+    const admin = await User.findOne({
+      where: { email, role_id: adminRoleId },
+    });
 
     if (!admin) {
       const error: IError = new Error(
@@ -151,7 +163,7 @@ export async function signInAdminHandler(
       throw error;
     }
 
-    if (admin?.dataValues.role_id !== getRoles?.dataValues.id) {
+    if (admin?.dataValues.role_id !== adminRoleId) {
       const error: IError = new Error(
         'You do not have permission to access this resource!'
       );
@@ -172,22 +184,48 @@ export async function signInAdminHandler(
 
     const { id, email: adminEmail, created_at, updated_at } = admin.dataValues;
 
-    const accessToken = await generateToken(
+    const newAccessToken = await generateToken(
       { id, email: adminEmail },
       accessTokenSecret as string,
       accessTokenExpiresIn
     );
 
-    const refreshToken = await generateToken(
-      { id, email: adminEmail },
+    const newRefreshToken = await generateToken(
+      { email: adminEmail },
       refreshTokenSecret as string,
       refreshTokenExpiredIn
     );
 
-    res.cookie('rt', refreshToken, {
+    if (cookies?.rt) {
+      const refreshToken = cookies.rt;
+      const refreshTokenAdmin = await RefreshToken.findOne({
+        where: { refresh_token: refreshToken },
+      });
+
+      if (!refreshTokenAdmin) {
+        await RefreshToken.destroy({
+          where: {
+            user_id: id,
+          },
+        });
+      }
+
+      res.clearCookie('rt', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      });
+    }
+
+    await RefreshToken.create({
+      refresh_token: newRefreshToken,
+      user_id: id,
+    });
+
+    res.cookie('rt', newRefreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: env === 'production',
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       domain: env === 'production' ? adminDomain : 'localhost',
     });
@@ -195,7 +233,7 @@ export async function signInAdminHandler(
     res.status(200).json({
       status: 'success',
       message: 'Signin admin successfully!',
-      access_token: accessToken,
+      access_token: newAccessToken,
       user: {
         id,
         email: adminEmail,
