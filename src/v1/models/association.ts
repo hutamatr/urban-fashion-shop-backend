@@ -1,13 +1,14 @@
-import Cart from '../v1/models/cart.model';
-import CartItem from '../v1/models/cart-item.model';
-import Category from '../v1/models/category.model';
-import Product from '../v1/models/product.model';
-import ResetPassword from '../v1/models/reset-password.model';
-import Role from '../v1/models/role.model';
-import Transaction from '../v1/models/transaction.model';
-import TransactionItem from '../v1/models/transaction-item.model';
-import User from '../v1/models/user.model';
-import Wishlist from '../v1/models/wishlist.model';
+import Cart from './cart.model';
+import CartItem from './cart-item.model';
+import Category from './category.model';
+import Product from './product.model';
+import RefreshToken from './refresh-token.model';
+import ResetPassword from './reset-password.model';
+import Role from './role.model';
+import Transaction from './transaction.model';
+import TransactionItem from './transaction-item.model';
+import User from './user.model';
+import Wishlist from './wishlist.model';
 
 export default function association() {
   // Category & Product Associations
@@ -51,4 +52,8 @@ export default function association() {
     through: TransactionItem,
     foreignKey: 'product_id',
   });
+
+  // RefreshToken & User Associations
+  User.hasMany(RefreshToken, { foreignKey: 'user_id' });
+  RefreshToken.belongsTo(User, { foreignKey: 'user_id' });
 }
