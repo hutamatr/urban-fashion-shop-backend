@@ -14,6 +14,7 @@ import {
   refreshTokenExpiredIn,
   refreshTokenSecret,
 } from '../../utils/constants';
+import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 import { comparePassword, hashPassword } from '../../utils/hash';
 import { generateToken } from '../../utils/jwt';
@@ -53,8 +54,7 @@ export async function signUpUserHandler(
     const confirmPassword = req.body.confirmPassword;
 
     if (password !== confirmPassword) {
-      const error: IError = new Error('Password not match!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Password not match!');
       throw error;
     }
 
@@ -78,8 +78,7 @@ export async function signUpUserHandler(
     });
 
     if (!createdUser) {
-      const error: IError = new Error('Failed to signup, try again later!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to signup, try again later!');
       throw error;
     }
 
@@ -161,10 +160,10 @@ export async function signInUserHandler(
     const user = await User.findOne({ where: { email, role_id: roleId } });
 
     if (!user) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        401,
         'User with this email could not be found!'
       );
-      error.statusCode = 401;
       throw error;
     }
 
@@ -174,8 +173,7 @@ export async function signInUserHandler(
     );
 
     if (!verifyPassword) {
-      const error: IError = new Error('Incorrect Password!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Incorrect Password!');
       throw error;
     }
 
@@ -329,8 +327,7 @@ export async function changePasswordHandler(
     });
 
     if (!user) {
-      const error: IError = new Error('User not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'User not found!');
       throw error;
     }
 
@@ -340,8 +337,7 @@ export async function changePasswordHandler(
     );
 
     if (!verifyCurrentPassword) {
-      const error: IError = new Error('Incorrect Password!');
-      error.statusCode = 400;
+      const error = new CustomError(400, 'Incorrect Password!');
       throw error;
     }
 
@@ -387,8 +383,7 @@ export async function resetPasswordLinkHandler(
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      const error: IError = new Error('User not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'User not found!');
       throw error;
     }
 
@@ -452,8 +447,7 @@ export async function resetPasswordHandler(
     });
 
     if (!user) {
-      const error: IError = new Error('Invalid link or expired!');
-      error.statusCode = 400;
+      const error = new CustomError(400, 'Invalid link or expired!');
       throw error;
     }
 
@@ -462,8 +456,7 @@ export async function resetPasswordHandler(
     });
 
     if (!token) {
-      const error: IError = new Error('Invalid link or expired!');
-      error.statusCode = 400;
+      const error = new CustomError(400, 'Invalid link or expired!');
       throw error;
     }
 

@@ -21,6 +21,7 @@ import {
   SHIPPING,
   shippingFlatRate,
 } from '../../utils/constants';
+import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 import Logger from '../../utils/logger';
 
@@ -64,8 +65,7 @@ export async function createTransaction(
     });
 
     if (!user) {
-      const error: IError = new Error('User not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'User not found!');
       throw error;
     }
 
@@ -104,8 +104,7 @@ export async function createTransaction(
     });
 
     if (!userCart) {
-      const error: IError = new Error('Cart not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Cart not found!');
       throw error;
     }
 
@@ -115,8 +114,7 @@ export async function createTransaction(
     });
 
     if (!userCartItem) {
-      const error: IError = new Error('Cart item not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Cart item not found!');
       throw error;
     }
 
@@ -196,16 +194,14 @@ export async function createTransaction(
     });
 
     if (response.status !== 201) {
-      const error: IError = new Error(await response.text());
-      error.statusCode = response.status;
+      const error = new CustomError(response.status, await response.text());
       throw error;
     }
 
     const data: IMidtransResponse = await response.json();
 
     if (!data?.token) {
-      const error: IError = new Error('Failed to create transaction!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Failed to create transaction!');
       throw error;
     }
 
@@ -224,8 +220,7 @@ export async function createTransaction(
     );
 
     if (!transaction?.id) {
-      const error: IError = new Error('Failed to create transaction!');
-      error.statusCode = 404;
+      const error = new CustomError(500, 'Failed to create transaction!');
       throw error;
     }
 
@@ -241,8 +236,7 @@ export async function createTransaction(
     );
 
     if (!transactionItemsCreate) {
-      const error: IError = new Error('Failed to create transaction!');
-      error.statusCode = 401;
+      const error = new CustomError(500, 'Failed to create transaction!');
       throw error;
     }
 
@@ -321,8 +315,7 @@ export async function getTransactions(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
@@ -333,8 +326,7 @@ export async function getTransactions(
     });
 
     if (!transactions) {
-      const error: IError = new Error('Transactions not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Transactions not found!');
       throw error;
     }
 
@@ -364,8 +356,7 @@ export async function getAllTransactionByUser(
     });
 
     if (transaction.length === 0) {
-      const error: IError = new Error('Transaction not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Transaction not found!');
       throw error;
     }
 
@@ -427,8 +418,7 @@ export async function getTransactionById(
     });
 
     if (!transaction) {
-      const error: IError = new Error('Transaction not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Transaction not found!');
       throw error;
     }
 
@@ -479,8 +469,7 @@ export async function updateTransactionStatus(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
@@ -489,8 +478,7 @@ export async function updateTransactionStatus(
     });
 
     if (!transaction) {
-      const error: IError = new Error('Transaction not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Transaction not found!');
       throw error;
     }
 
@@ -520,8 +508,7 @@ export async function deleteTransactionFromDB(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
@@ -530,8 +517,7 @@ export async function deleteTransactionFromDB(
     });
 
     if (!transaction) {
-      const error: IError = new Error('Transaction not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Transaction not found!');
       throw error;
     }
 
@@ -677,16 +663,14 @@ export async function cancelTransaction(
     );
 
     if (response.status !== 200) {
-      const error: IError = new Error(await response.text());
-      error.statusCode = response.status;
+      const error = new CustomError(response.status, await response.text());
       throw error;
     }
 
     const data = await response.json();
 
     if (parseInt(data?.status_code) >= 400) {
-      const error: IError = new Error(data.status_message);
-      error.statusCode = data.status_code;
+      const error = new CustomError(data.status_code, data.status_message);
       throw error;
     }
 
@@ -696,8 +680,7 @@ export async function cancelTransaction(
     });
 
     if (!transaction) {
-      const error: IError = new Error('Transaction not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Transaction not found!');
       throw error;
     }
 

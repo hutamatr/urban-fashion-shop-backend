@@ -6,6 +6,7 @@ import {
   deleteImageFromStorage,
   imageUpload,
 } from '../../database/firebase.storage';
+import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 
 interface IRequestParams {
@@ -63,8 +64,7 @@ export async function getProducts(
     }
 
     if (!products) {
-      const error: IError = new Error('Failed to get products!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to get products!');
       throw error;
     }
 
@@ -98,10 +98,10 @@ export async function getProduct(
     const product = await Product.findOne({ where: { id: productId } });
 
     if (!product) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        404,
         'Failed to get product, product not found!'
       );
-      error.statusCode = 422;
       throw error;
     }
 
@@ -137,24 +137,22 @@ export async function createProduct(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
     if (!file) {
-      const error: IError = new Error('Image is required!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Image is required!');
       throw error;
     }
 
     const findCategory = await Category.findOne({ where: { id: categoryId } });
 
     if (!findCategory) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        404,
         'Failed to post product, category not found!'
       );
-      error.statusCode = 422;
       throw error;
     }
 
@@ -174,8 +172,7 @@ export async function createProduct(
     });
 
     if (!createdProduct) {
-      const error: IError = new Error('Failed to post product!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to post product!');
       throw error;
     }
 
@@ -210,18 +207,17 @@ export async function updateProduct(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
     const product = await Product.findOne({ where: { id: productId } });
 
     if (!product) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        404,
         'Failed to get product, product not found!'
       );
-      error.statusCode = 404;
       throw error;
     }
 
@@ -253,8 +249,7 @@ export async function updateProduct(
     const updatedProduct = await product.save();
 
     if (!updatedProduct) {
-      const error: IError = new Error('Failed to updated product');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to updated product');
       throw error;
     }
 
@@ -283,8 +278,7 @@ export async function deleteProduct(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
@@ -298,10 +292,10 @@ export async function deleteProduct(
     const deletedProduct = await Product.destroy({ where: { id: productId } });
 
     if (deletedProduct <= 0) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        404,
         'Failed to delete product, product not found!'
       );
-      error.statusCode = 404;
       throw error;
     }
 

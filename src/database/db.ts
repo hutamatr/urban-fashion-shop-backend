@@ -20,7 +20,10 @@ const dbConfig: {
     host: string | undefined;
     dialect: Dialect | undefined;
     timezone: string | undefined;
-    logging?: boolean;
+    logging?:
+      | boolean
+      | ((_sql: string, _timing?: number | undefined) => void)
+      | undefined;
   };
 } = {
   development: {

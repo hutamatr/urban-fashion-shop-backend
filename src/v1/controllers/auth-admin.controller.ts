@@ -12,6 +12,7 @@ import {
   refreshTokenExpiredIn,
   refreshTokenSecret,
 } from '../../utils/constants';
+import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 import { comparePassword, hashPassword } from '../../utils/hash';
 import { generateToken } from '../../utils/jwt';
@@ -40,14 +41,12 @@ export async function signUpAdminHandler(
     const adminCodeClient = req.body.adminCode;
 
     if (adminCodeClient !== adminCode) {
-      const error: IError = new Error('Admin code not match!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Admin code not match!');
       throw error;
     }
 
     if (password !== confirmPassword) {
-      const error: IError = new Error('Password not match!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Password code not match!');
       throw error;
     }
 
@@ -71,8 +70,7 @@ export async function signUpAdminHandler(
     });
 
     if (!createdAdmin) {
-      const error: IError = new Error('Failed to signup, try again later!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to signup, try again later!');
       throw error;
     }
 
@@ -156,18 +154,18 @@ export async function signInAdminHandler(
     });
 
     if (!admin) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        401,
         'Admin with this email could not be found!'
       );
-      error.statusCode = 401;
       throw error;
     }
 
     if (admin?.dataValues.role_id !== adminRoleId) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        401,
         'You do not have permission to access this resource!'
       );
-      error.statusCode = 401;
       throw error;
     }
 
@@ -177,8 +175,7 @@ export async function signInAdminHandler(
     );
 
     if (!verifyPassword) {
-      const error: IError = new Error('Incorrect Password!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Incorrect Password!');
       throw error;
     }
 
