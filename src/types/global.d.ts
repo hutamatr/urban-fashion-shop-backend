@@ -1,10 +1,6 @@
 export {};
 
 declare global {
-  interface IError extends Error {
-    statusCode?: number;
-  }
-
   interface IMidtransResponse {
     token: string;
     redirect_url: string;

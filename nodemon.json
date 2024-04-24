@@ -1,6 +1,0 @@
-{
-  "watch": ["src", ".env"],
-  "ext": "ts",
-  "ignore": ["node_modules", "build", "__test__"],
-  "exec": "babel-node src/server.ts --extensions \".ts\""
-}
