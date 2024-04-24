@@ -10,6 +10,7 @@ import errorMiddleware from './middleware/error';
 import morganMiddleware from './middleware/log';
 import corsMiddleware from './utils/cors';
 import { credentials } from './utils/credentials';
+import { CustomError } from './utils/custom-error';
 import errorHandler from './utils/error-handler';
 import limiter from './utils/rate-limiter';
 import association from './v1/models/association';
@@ -48,8 +49,7 @@ app.use('/api/v1/refresh', refreshRoutes);
 
 app.all('*', (_req: Request, _res: Response, next: NextFunction) => {
   try {
-    const error: IError = new Error('Not Found!');
-    error.statusCode = 404;
+    const error = new CustomError(404, 'Not Found!');
     throw error;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

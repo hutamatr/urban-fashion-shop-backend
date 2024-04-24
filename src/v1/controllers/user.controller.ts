@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import Role from '../models/role.model';
 import User from '../models/user.model';
+import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 
 /**
@@ -29,16 +30,14 @@ export async function getUsers(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
     const getRole = await Role.findOne({ where: { role_name: 'user' } });
 
     if (!getRole) {
-      const error: IError = new Error('Users empty, please try again!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Users empty, please try again!');
       throw error;
     }
 
@@ -93,8 +92,7 @@ export async function getUsers(
     }
 
     if (!users) {
-      const error: IError = new Error('Failed to get users!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to get users!');
       throw error;
     }
 
@@ -133,16 +131,8 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
   try {
     const userId = req.params?.userId;
 
-    const getRole = await Role.findOne({ where: { role_name: 'user' } });
-
-    if (!getRole) {
-      const error: IError = new Error('User role not found, please try again!');
-      error.statusCode = 422;
-      throw error;
-    }
-
     const user = await User.findOne({
-      where: { id: userId, role_id: getRole.id },
+      where: { id: userId },
       attributes: [
         'id',
         'first_name',
@@ -165,8 +155,7 @@ export async function getUser(req: Request, res: Response, next: NextFunction) {
     });
 
     if (!user) {
-      const error: IError = new Error('User not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'User not found!');
       throw error;
     }
 
@@ -210,8 +199,7 @@ export async function updateUser(
     });
 
     if (!user) {
-      const error: IError = new Error('User not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'User not found!');
       throw error;
     }
 
@@ -256,8 +244,7 @@ export async function deleteUser(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
@@ -266,8 +253,10 @@ export async function deleteUser(
     });
 
     if (deletedUser <= 0) {
-      const error: IError = new Error('Failed to delete user, user not found!');
-      error.statusCode = 422;
+      const error = new CustomError(
+        404,
+        'Failed to delete user, user not found!'
+      );
       throw error;
     }
 

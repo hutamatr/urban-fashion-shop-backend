@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import Cart from '../models/cart.model';
 import CartItem from '../models/cart-item.model';
 import Product from '../models/product.model';
+import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 
 interface IRequestBody {
@@ -165,8 +166,7 @@ export async function createCart(
       });
 
       if (!createdNewCart) {
-        const error: IError = new Error('Failed add item to cart!');
-        error.statusCode = 422;
+        const error = new CustomError(422, 'Failed add item to cart!');
         throw error;
       }
 
@@ -177,8 +177,7 @@ export async function createCart(
       });
 
       if (!addedCartItem) {
-        const error: IError = new Error('Failed add item to cart!');
-        error.statusCode = 422;
+        const error = new CustomError(422, 'Failed add item to cart!');
         throw error;
       }
 
@@ -236,8 +235,7 @@ export async function updateCart(
     const stock_quantity = product?.dataValues.stock_quantity as number;
 
     if (!userCart) {
-      const error: IError = new Error('Cart not found!');
-      error.statusCode = 422;
+      const error = new CustomError(404, 'Cart not found!');
       throw error;
     }
 
@@ -246,8 +244,7 @@ export async function updateCart(
     });
 
     if (!cartItemProduct) {
-      const error: IError = new Error('Cart item not found!');
-      error.statusCode = 422;
+      const error = new CustomError(404, 'Cart item not found!');
       throw error;
     }
 
@@ -256,17 +253,16 @@ export async function updateCart(
     let newTotalPrice;
 
     if (minusQuantity && plusQuantity) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        400,
         'Quantity can not be both minus and plus!'
       );
-      error.statusCode = 422;
       throw error;
     }
 
     if (minusQuantity) {
       if (currentQuantity <= 1 || currentQuantity - minusQuantity < 1) {
-        const error: IError = new Error('Quantity not enough!');
-        error.statusCode = 422;
+        const error = new CustomError(400, 'Quantity not enough!');
         throw error;
       }
 
@@ -278,10 +274,10 @@ export async function updateCart(
     }
     if (plusQuantity) {
       if (currentQuantity + plusQuantity >= stock_quantity) {
-        const error: IError = new Error(
+        const error = new CustomError(
+          400,
           'Stock quantity of product not enough!'
         );
-        error.statusCode = 422;
         throw error;
       }
 
@@ -343,8 +339,7 @@ export async function deleteCart(
     const product = await Product.findOne({ where: { id: productId } });
 
     if (!userCart) {
-      const error: IError = new Error('Cart not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Cart not found!');
       throw error;
     }
 
@@ -353,8 +348,7 @@ export async function deleteCart(
     });
 
     if (!cartItems) {
-      const error: IError = new Error('Product cart not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Product cart not found!');
       throw error;
     }
 
@@ -379,8 +373,7 @@ export async function deleteCart(
     });
 
     if (deletedCartProduct <= 0) {
-      const error: IError = new Error('Product cart not found!');
-      error.statusCode = 404;
+      const error = new CustomError(404, 'Product cart not found!');
       throw error;
     }
 

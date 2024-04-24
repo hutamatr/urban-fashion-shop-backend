@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 
 import { accessTokenSecret } from '../utils/constants';
+import { CustomError } from '../utils/custom-error';
 import { verifyToken } from '../utils/jwt';
 import Role from '../v1/models/role.model';
 import User from '../v1/models/user.model';
@@ -29,8 +30,7 @@ export async function authMiddleware(
     const tokenHeader = req.header('Authorization');
 
     if (!tokenHeader) {
-      const error: IError = new Error('Not Authenticated');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not Authenticated');
       throw error;
     }
 
@@ -41,8 +41,7 @@ export async function authMiddleware(
     );
 
     if (!credential) {
-      const error: IError = new Error('Invalid Token');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Invalid Token');
       throw error;
     }
 
@@ -63,8 +62,7 @@ export async function authMiddleware(
     if (!getRoles) {
       const createRole = await Role.create({ role_name: 'admin' });
       if (!createRole) {
-        const error: IError = new Error('Failed to create role!');
-        error.statusCode = 422;
+        const error = new CustomError(422, 'Failed to create role');
         throw error;
       }
       roleId = createRole.dataValues.id;

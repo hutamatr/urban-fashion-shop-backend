@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
 import Category from '../models/category.model';
+import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 
 interface IRequestBody {
@@ -44,8 +45,7 @@ export async function getCategories(
     }
 
     if (!categories) {
-      const error: IError = new Error('Failed to get categories!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to get categories!');
       throw error;
     }
 
@@ -89,7 +89,8 @@ export async function getCategory(
     const category = await Category.findOne({ where: { id: categoryId } });
 
     if (!category) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        422,
         'Failed to get category, category not found!'
       );
       error.statusCode = 422;
@@ -130,8 +131,7 @@ export async function createCategory(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
@@ -140,8 +140,7 @@ export async function createCategory(
     });
 
     if (!createdCategory) {
-      const error: IError = new Error('Failed to create category!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to create category!');
       throw error;
     }
 
@@ -180,8 +179,7 @@ export async function updateCategory(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
@@ -190,10 +188,10 @@ export async function updateCategory(
     });
 
     if (!category) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        404,
         'Failed to update category, category not found!'
       );
-      error.statusCode = 422;
       throw error;
     }
 
@@ -204,8 +202,7 @@ export async function updateCategory(
     const updatedCategory = await category.save();
 
     if (!updatedCategory) {
-      const error: IError = new Error('Failed to update category!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to update category!');
       throw error;
     }
 
@@ -243,8 +240,7 @@ export async function deleteCategory(
     const isAdmin = req.isAdmin;
 
     if (!isAdmin) {
-      const error: IError = new Error('Not authorized!');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not authorized!');
       throw error;
     }
 
@@ -253,10 +249,10 @@ export async function deleteCategory(
     });
 
     if (deletedCategory <= 0) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        404,
         'Failed to delete category, category not found!'
       );
-      error.statusCode = 404;
       throw error;
     }
 

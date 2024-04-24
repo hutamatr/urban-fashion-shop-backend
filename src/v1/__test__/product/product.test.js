@@ -92,12 +92,12 @@ describe('Product Test Cases', () => {
     expect(res.statusCode).toBe(200);
   });
 
-  test('should return 422 status code when get one product after delete one', async () => {
+  test('should return 404 status code if product want to delete not found', async () => {
     const res = await request(app)
       .get(`${domain}/products/${productId}`)
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json');
-    expect(res.statusCode).toBe(422);
+    expect(res.statusCode).toBe(404);
   });
 
   // After all tests have finished, close the DB connection

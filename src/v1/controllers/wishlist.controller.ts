@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import Product from '../models/product.model';
 import Wishlist from '../models/wishlist.model';
+import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 
 interface IRequestBody {
@@ -54,10 +55,10 @@ export async function getWishlistsByUser(
     });
 
     if (!wishlists) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        404,
         'Failed to get wishlist, wishlist not found!'
       );
-      error.statusCode = 422;
       throw error;
     }
 
@@ -113,8 +114,7 @@ export async function getWishlist(
     });
 
     if (!wishlist) {
-      const error: IError = new Error('Wishlist not found!');
-      error.statusCode = 422;
+      const error = new CustomError(404, 'Wishlist not found!');
       throw error;
     }
 
@@ -155,8 +155,7 @@ export async function createWishlist(
     });
 
     if (wishlist) {
-      const error: IError = new Error('Wishlist already exists!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Wishlist already exists!');
       throw error;
     }
 
@@ -166,8 +165,7 @@ export async function createWishlist(
     });
 
     if (!createdWishlist) {
-      const error: IError = new Error('Failed to create wishlist!');
-      error.statusCode = 422;
+      const error = new CustomError(422, 'Failed to create wishlist!');
       throw error;
     }
 
@@ -228,10 +226,10 @@ export async function deleteWishlist(
     });
 
     if (deletedWishlist <= 0) {
-      const error: IError = new Error(
+      const error = new CustomError(
+        404,
         'Failed to delete wishlist, wishlist not found!'
       );
-      error.statusCode = 422;
       throw error;
     }
 

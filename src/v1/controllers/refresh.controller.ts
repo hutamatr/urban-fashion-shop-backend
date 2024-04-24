@@ -8,6 +8,7 @@ import {
   accessTokenSecret,
   refreshTokenSecret,
 } from '../../utils/constants';
+import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 import { generateToken } from '../../utils/jwt';
 
@@ -32,8 +33,7 @@ export async function getRefreshToken(
     const cookies = req.cookies;
 
     if (!cookies?.rt) {
-      const error: IError = new Error('Not Authenticated');
-      error.statusCode = 401;
+      const error = new CustomError(401, 'Not Authenticated');
       throw error;
     }
 
@@ -57,8 +57,7 @@ export async function getRefreshToken(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         async (err: jwt.VerifyErrors | null, decoded: any) => {
           if (err) {
-            const error: IError = new Error('Token expired or invalid');
-            error.statusCode = 403;
+            const error = new CustomError(403, 'Token expired or invalid');
             throw error;
           }
           const user = await User.findOne({
@@ -66,16 +65,14 @@ export async function getRefreshToken(
           });
 
           if (!user) {
-            const error: IError = new Error('User does not exist');
-            error.statusCode = 401;
+            const error = new CustomError(404, 'User does not exist');
             throw error;
           }
 
           await RefreshToken.destroy({ where: { user_id: user?.id } });
         }
       );
-      const error: IError = new Error('Token expired or invalid');
-      error.statusCode = 403;
+      const error = new CustomError(403, 'Token expired or invalid');
       throw error;
     }
 
@@ -84,8 +81,7 @@ export async function getRefreshToken(
     });
 
     if (!user) {
-      const error: IError = new Error('User does not exist');
-      error.statusCode = 401;
+      const error = new CustomError(404, 'User does not exist');
       throw error;
     }
 
@@ -105,8 +101,7 @@ export async function getRefreshToken(
         }
 
         if (err || user.email !== decoded?.email) {
-          const error: IError = new Error('User does not exist');
-          error.statusCode = 401;
+          const error = new CustomError(404, 'User does not exist');
           throw error;
         }
 
