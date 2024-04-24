@@ -4,8 +4,10 @@ import { adminBaseURL, feBaseURL, host } from './constants';
 
 export const allowedOrigins = [
   `${host}:5173`,
+  `${host}:4173`,
   `${host}:3000`,
   'http://127.0.0.1:5173',
+  'http://127.0.0.1:4173',
   'http://127.0.0.1:3000',
   feBaseURL as string,
   adminBaseURL as string,

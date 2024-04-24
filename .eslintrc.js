@@ -11,6 +11,7 @@ module.exports = {
   ],
   parser: '@typescript-eslint/parser',
   rules: {
+    '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: false }],
     'no-unused-vars': [1, { args: 'after-used', argsIgnorePattern: '^_' }],
     'no-console': 'warn',
     '@typescript-eslint/explicit-module-boundary-types': 'off',

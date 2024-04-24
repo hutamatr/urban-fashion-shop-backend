@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { NextFunction, Request, Response } from 'express';
 
+import RefreshToken from '../models/refresh-token.model';
 import ResetPassword from '../models/reset-password.model';
 import Role from '../models/role.model';
 import User from '../models/user.model';
@@ -101,10 +102,15 @@ export async function signUpUserHandler(
       refreshTokenExpiredIn
     );
 
+    await RefreshToken.create({
+      refresh_token: refreshToken,
+      user_id: id,
+    });
+
     res.cookie('rt', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: env === 'production',
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       domain: env === 'production' ? feDomain : 'localhost',
     });
@@ -144,6 +150,7 @@ export async function signInUserHandler(
   next: NextFunction
 ) {
   try {
+    const cookies = req.cookies;
     const email = req.body.email;
     const password = req.body.password;
 
@@ -174,22 +181,48 @@ export async function signInUserHandler(
 
     const { id, email: userEmail, created_at, updated_at } = user.dataValues;
 
-    const accessToken = await generateToken(
+    const newAccessToken = await generateToken(
       { id, email: userEmail },
       accessTokenSecret as string,
       accessTokenExpiresIn
     );
 
-    const refreshToken = await generateToken(
-      { id, email: userEmail },
+    const newRefreshToken = await generateToken(
+      { email: userEmail },
       refreshTokenSecret as string,
       refreshTokenExpiredIn
     );
 
-    res.cookie('rt', refreshToken, {
+    if (cookies?.rt) {
+      const refreshToken = cookies.rt;
+      const refreshTokenUser = await RefreshToken.findOne({
+        where: { refresh_token: refreshToken },
+      });
+
+      if (!refreshTokenUser) {
+        await RefreshToken.destroy({
+          where: {
+            user_id: id,
+          },
+        });
+      }
+
+      res.clearCookie('rt', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      });
+    }
+
+    await RefreshToken.create({
+      refresh_token: newRefreshToken,
+      user_id: id,
+    });
+
+    res.cookie('rt', newRefreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: env === 'production',
+      secure: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       domain: env === 'production' ? feDomain : 'localhost',
     });
@@ -197,7 +230,7 @@ export async function signInUserHandler(
     res.status(200).json({
       status: 'success',
       message: 'Signin user successfully!',
-      access_token: accessToken,
+      access_token: newAccessToken,
       user: {
         id,
         email: userEmail,
@@ -233,16 +266,31 @@ export async function signOutHandler(
   next: NextFunction
 ) {
   try {
-    const refreshToken = req.cookies.rt;
+    const cookies = req.cookies;
 
-    if (!refreshToken) {
+    if (!cookies?.rt) {
       return res.sendStatus(204);
     }
+
+    const refreshTokenCookie = cookies.rt;
+    const refreshTokenUser = await RefreshToken.findOne({
+      where: { refresh_token: refreshTokenCookie },
+    });
+    if (!refreshTokenUser) {
+      res.clearCookie('rt', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      });
+      return res.sendStatus(204);
+    }
+
+    await refreshTokenUser.destroy();
 
     res.clearCookie('rt', {
       httpOnly: true,
       sameSite: 'none',
-      secure: env === 'production',
+      secure: true,
     });
 
     res

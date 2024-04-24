@@ -1,20 +1,52 @@
-import fs from 'fs';
-import morgan from 'morgan';
-import path from 'path';
+import winston from 'winston';
 
-/** The code `const accessLogStream = fs.createWriteStream(path.join(__dirname, '..', '..', 'logs',
- * 'access.log'), { flags: 'a' });` is creating a write stream to a log file named "access.log".
- **/
-const accessLogStream = fs.createWriteStream(
-  path.join(__dirname, '..', '..', 'logs', 'access.log'),
-  { flags: 'a' }
+import { env } from './constants';
+
+const levels = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  http: 3,
+  debug: 4,
+};
+
+const level = () => {
+  const isDevelopment = env === 'development';
+  return isDevelopment ? 'debug' : 'warn';
+};
+
+const colors = {
+  error: 'red',
+  warn: 'yellow',
+  info: 'green',
+  http: 'magenta',
+  debug: 'white',
+};
+
+winston.addColors(colors);
+
+const format = winston.format.combine(
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
+  winston.format.colorize({ all: true }),
+  winston.format.printf(
+    (info) => `${info.timestamp} ${info.level}: ${info.message}`
+  )
 );
 
-/**
- * The logger function returns a middleware function that logs HTTP requests.
- * @returns The function `logger` is returning the result of calling `morgan` with the arguments
- * `'combined'` and `{ stream: accessLogStream }`.
- */
-export default function logger() {
-  return morgan('combined', { stream: accessLogStream });
-}
+const transports = [
+  new winston.transports.Console(),
+  new winston.transports.File({
+    filename: 'logs/error.log',
+    level: 'error',
+  }),
+  new winston.transports.File({ filename: 'logs/all.log' }),
+];
+
+const Logger = winston.createLogger({
+  level: level(),
+  levels,
+  format,
+  transports,
+});
+
+export default Logger;

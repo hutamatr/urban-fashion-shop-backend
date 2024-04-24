@@ -22,6 +22,7 @@ import {
   shippingFlatRate,
 } from '../../utils/constants';
 import errorHandler from '../../utils/error-handler';
+import Logger from '../../utils/logger';
 
 async function sequelizeTransaction() {
   return await sequelize.transaction();
@@ -643,8 +644,7 @@ export async function transactionNotification(
 
   if (transaction) {
     updateStatusByMidtrans(transaction, data).then((result) => {
-      // eslint-disable-next-line no-console
-      console.log('result', result);
+      Logger.debug('result', result);
     });
   }
 
