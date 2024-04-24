@@ -10,7 +10,6 @@ import {
   accessTokenSecret,
   env,
   feBaseURL,
-  feDomain,
   refreshTokenExpiredIn,
   refreshTokenSecret,
 } from '../../utils/constants';
@@ -109,9 +108,8 @@ export async function signUpUserHandler(
     res.cookie('rt', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: true,
+      secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: env === 'production' ? feDomain : 'localhost',
     });
 
     res.status(201).json({
@@ -208,7 +206,7 @@ export async function signInUserHandler(
       res.clearCookie('rt', {
         httpOnly: true,
         sameSite: 'none',
-        secure: true,
+        secure: env === 'production',
       });
     }
 
@@ -220,9 +218,8 @@ export async function signInUserHandler(
     res.cookie('rt', newRefreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: true,
+      secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: env === 'production' ? feDomain : 'localhost',
     });
 
     res.status(200).json({
@@ -274,22 +271,27 @@ export async function signOutHandler(
     const refreshTokenUser = await RefreshToken.findOne({
       where: { refresh_token: refreshTokenCookie },
     });
+
     if (!refreshTokenUser) {
       res.clearCookie('rt', {
         httpOnly: true,
         sameSite: 'none',
-        secure: true,
+        secure: env === 'production',
       });
       return res.sendStatus(204);
     }
 
-    await refreshTokenUser.destroy();
-
-    res.clearCookie('rt', {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
+    const deletedRefreshToken = await RefreshToken.destroy({
+      where: { refresh_token: refreshTokenCookie },
     });
+
+    if (deletedRefreshToken > 0) {
+      res.clearCookie('rt', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: env === 'production',
+      });
+    }
 
     res
       .status(200)

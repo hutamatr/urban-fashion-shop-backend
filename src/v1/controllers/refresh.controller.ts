@@ -6,6 +6,7 @@ import User from '../models/user.model';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
+  env,
   refreshTokenSecret,
 } from '../../utils/constants';
 import { CustomError } from '../../utils/custom-error';
@@ -42,7 +43,7 @@ export async function getRefreshToken(
     res.clearCookie('rt', {
       httpOnly: true,
       sameSite: 'none',
-      secure: true,
+      secure: env === 'production',
     });
 
     const refreshTokenUser = await RefreshToken.findOne({
@@ -128,7 +129,7 @@ export async function getRefreshToken(
         res.cookie('rt', newRefreshToken, {
           httpOnly: true,
           sameSite: 'none',
-          secure: true,
+          secure: env === 'production',
           maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
