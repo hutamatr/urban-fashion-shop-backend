@@ -7,7 +7,6 @@ import {
   accessTokenExpiresIn,
   accessTokenSecret,
   adminCode,
-  adminDomain,
   env,
   refreshTokenExpiredIn,
   refreshTokenSecret,
@@ -101,9 +100,8 @@ export async function signUpAdminHandler(
     res.cookie('rt', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: true,
+      secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: env === 'production' ? adminDomain : 'localhost',
     });
 
     res.status(201).json({
@@ -210,7 +208,7 @@ export async function signInAdminHandler(
       res.clearCookie('rt', {
         httpOnly: true,
         sameSite: 'none',
-        secure: true,
+        secure: env === 'production',
       });
     }
 
@@ -222,9 +220,8 @@ export async function signInAdminHandler(
     res.cookie('rt', newRefreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: true,
+      secure: env === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      domain: env === 'production' ? adminDomain : 'localhost',
     });
 
     res.status(200).json({
