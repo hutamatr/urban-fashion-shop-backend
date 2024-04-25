@@ -41,12 +41,12 @@ export function generateToken(
  * @param {string} tokenSecret - The `tokenSecret` parameter is a string that represents the secret key
  * used to sign and verify the token. It is a shared secret between the server generating the token and
  * the server verifying the token.
- * @returns a Promise that resolves to either a string, jwt.JwtPayload, or undefined.
+ * @returns a Promise that resolves to a jwt.JwtPayload or undefined.
  */
 export function verifyToken(
   token: string,
   tokenSecret: string
-): Promise<jwt.JwtPayload> {
+): Promise<jwt.JwtPayload | undefined> {
   return new Promise((resolve, reject) => {
     jwt.verify(token, tokenSecret, (error, decoded) => {
       if (error) {
@@ -54,7 +54,7 @@ export function verifyToken(
         return;
       }
 
-      resolve(decoded as jwt.JwtPayload);
+      resolve(decoded as jwt.JwtPayload | undefined);
     });
   });
 }

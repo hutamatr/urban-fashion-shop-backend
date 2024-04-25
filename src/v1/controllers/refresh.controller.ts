@@ -7,11 +7,12 @@ import {
   accessTokenExpiresIn,
   accessTokenSecret,
   env,
+  refreshTokenExpiredIn,
   refreshTokenSecret,
 } from '../../utils/constants';
 import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
-import { generateToken } from '../../utils/jwt';
+import { generateToken, verifyToken } from '../../utils/jwt';
 
 /**
  * The function `getRefreshToken` is an asynchronous function that handles the retrieval and
@@ -55,14 +56,19 @@ export async function getRefreshToken(
       jwt.verify(
         refreshTokenCookie,
         refreshTokenSecret as string,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        async (err: jwt.VerifyErrors | null, decoded: any) => {
+        async (
+          err: jwt.VerifyErrors | null,
+          decoded: string | jwt.JwtPayload | undefined
+        ) => {
           if (err) {
             const error = new CustomError(403, 'Token expired or invalid');
             throw error;
           }
+
+          const tokenDecoded = decoded as jwt.JwtPayload;
+
           const user = await User.findOne({
-            where: { email: decoded?.email },
+            where: { email: tokenDecoded?.email },
           });
 
           if (!user) {
@@ -86,60 +92,63 @@ export async function getRefreshToken(
       throw error;
     }
 
-    // Generate new access token and refresh token
-    jwt.verify(
-      refreshTokenUser.refresh_token,
-      refreshTokenSecret as string,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      async (err: jwt.VerifyErrors | null, decoded: any) => {
-        if (err) {
-          await RefreshToken.destroy({
-            where: {
-              user_id: user?.id,
-              refresh_token: refreshTokenCookie,
-            },
-          });
-        }
+    const { id, email } = user.dataValues;
 
-        if (err || user.email !== decoded?.email) {
-          const error = new CustomError(404, 'User does not exist');
-          throw error;
-        }
-
-        const newAccessToken = await generateToken(
-          {
-            id: user?.id,
-            email: decoded?.email,
+    try {
+      const decodedRefreshToken = await verifyToken(
+        refreshTokenCookie,
+        refreshTokenSecret as string
+      );
+      if (!decodedRefreshToken) {
+        await RefreshToken.destroy({
+          where: {
+            user_id: id,
+            refresh_token: refreshTokenCookie,
           },
-          accessTokenSecret as string,
-          accessTokenExpiresIn
-        );
-
-        const newRefreshToken = await generateToken(
-          { email: decoded?.email },
-          refreshTokenSecret as string,
-          accessTokenExpiresIn
-        );
-
-        await RefreshToken.create({
-          user_id: user?.id,
-          refresh_token: newRefreshToken,
-        });
-
-        res.cookie('rt', newRefreshToken, {
-          httpOnly: true,
-          sameSite: 'none',
-          secure: env === 'production',
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-
-        res.status(200).json({
-          status: 'success',
-          message: 'Access token generated successfully',
-          access_token: newAccessToken,
         });
       }
+    } catch (_) {
+      const error = new CustomError(403, 'Token expired or invalid');
+      throw error;
+    }
+
+    // Generate new access token and refresh token
+    const newAccessToken = await generateToken(
+      { id, email },
+      accessTokenSecret as string,
+      accessTokenExpiresIn
     );
+
+    const newRefreshToken = await generateToken(
+      { email },
+      refreshTokenSecret as string,
+      refreshTokenExpiredIn
+    );
+
+    await RefreshToken.destroy({
+      where: {
+        user_id: id,
+        refresh_token: refreshTokenCookie,
+      },
+    });
+
+    await RefreshToken.create({
+      user_id: id,
+      refresh_token: newRefreshToken,
+    });
+
+    res.cookie('rt', newRefreshToken, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: env === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Access token generated successfully',
+      access_token: newAccessToken,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

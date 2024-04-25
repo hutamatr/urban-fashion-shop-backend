@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { JwtPayload } from 'jsonwebtoken';
 
 import { accessTokenSecret } from '../utils/constants';
 import { CustomError } from '../utils/custom-error';
@@ -34,9 +33,9 @@ export async function authMiddleware(
       throw error;
     }
 
-    const token = tokenHeader.split(' ')[1];
-    const credential: JwtPayload = await verifyToken(
-      token,
+    const accessToken = tokenHeader.split(' ')[1];
+    const credential = await verifyToken(
+      accessToken,
       accessTokenSecret as string
     );
 
