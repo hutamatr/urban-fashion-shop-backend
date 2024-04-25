@@ -27,6 +27,7 @@ const app = express();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(upload.single('image_url'));
