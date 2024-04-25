@@ -95,7 +95,7 @@ export async function signUpUserHandler(
     );
 
     const refreshToken = await generateToken(
-      { id, email: userEmail },
+      { email: userEmail },
       refreshTokenSecret as string,
       refreshTokenExpiredIn
     );
