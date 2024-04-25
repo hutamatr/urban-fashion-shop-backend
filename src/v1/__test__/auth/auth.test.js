@@ -44,7 +44,6 @@ describe('Auth Test Cases', () => {
       })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
-      .set('Cookie', 'rt=' + token)
       .auth(token, { type: 'bearer' });
     expect(res.statusCode).toBe(200);
   });
@@ -66,6 +65,7 @@ describe('Auth Test Cases', () => {
       })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json');
+
     expect(res.statusCode).toBe(200);
   });
 

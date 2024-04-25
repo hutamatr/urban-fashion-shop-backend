@@ -87,7 +87,7 @@ export async function signUpAdminHandler(
     );
 
     const refreshToken = await generateToken(
-      { id, email: adminEmail },
+      { email: adminEmail },
       refreshTokenSecret as string,
       refreshTokenExpiredIn
     );
