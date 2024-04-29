@@ -1,6 +1,6 @@
 {
   "name": "urban-fashion-shop-backend",
-  "version": "1.0.0",
+  "version": "1.0.15",
   "author": "Hutama Trirahmanto",
   "license": "MIT",
   "description": "Backend for Urban Fashion Shop.",
@@ -14,7 +14,7 @@
     "build": "rm -rf build/ && set NODE_ENV=production && tsc --build",
     "test": "NODE_ENV=test jest --runInBand",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
-    "lint:fix": "eslint . --fix && yarn format",
+    "lint:fix": "eslint . --fix && pnpm format",
     "format": "prettier --write './**/*.{js,ts,css,md,json}' --config ./.prettierrc.js",
     "format:check": "prettier -c './**/*.{js,ts,css,md,json}' --config ./.prettierrc.js",
     "typechecks": "tsc --noEmit --incremental false",
@@ -29,7 +29,7 @@
     "express": "^4.19.2",
     "express-fileupload": "^1.5.0",
     "express-rate-limit": "^7.2.0",
-    "firebase": "^10.11.0",
+    "firebase": "^10.11.1",
     "firebase-admin": "^12.1.0",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -41,8 +41,8 @@
     "sequelize": "^6.37.3",
     "winston": "^3.13.0",
     "xhr2": "^0.2.1",
-    "zod": "^3.23.0",
-    "zod-validation-error": "^3.1.0"
+    "zod": "^3.23.4",
+    "zod-validation-error": "^3.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",

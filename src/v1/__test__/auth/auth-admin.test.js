@@ -7,7 +7,7 @@ import { sequelize } from '../../../database/db';
 import { adminCode } from '../../../utils/constants';
 
 const domain = '/api/v1';
-const email = faker.internet.email();
+const email = faker.internet.email({ firstName: 'admin' });
 const password = 'Admin123!';
 const confirmPassword = password;
 
