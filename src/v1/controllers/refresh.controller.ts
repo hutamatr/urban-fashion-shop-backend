@@ -6,6 +6,7 @@ import User from '../models/user.model';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
+  cookiesMaxAge,
   env,
   refreshTokenExpiredIn,
   refreshTokenSecret,
@@ -141,7 +142,7 @@ export async function getRefreshToken(
       httpOnly: true,
       sameSite: 'none',
       secure: env === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: cookiesMaxAge,
     });
 
     res.status(200).json({

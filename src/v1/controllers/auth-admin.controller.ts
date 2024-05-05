@@ -7,6 +7,7 @@ import {
   accessTokenExpiresIn,
   accessTokenSecret,
   adminCode,
+  cookiesMaxAge,
   env,
   refreshTokenExpiredIn,
   refreshTokenSecret,
@@ -101,7 +102,7 @@ export async function signUpAdminHandler(
       httpOnly: true,
       sameSite: 'none',
       secure: env === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: cookiesMaxAge,
     });
 
     res.status(201).json({
@@ -221,7 +222,7 @@ export async function signInAdminHandler(
       httpOnly: true,
       sameSite: 'none',
       secure: env === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: cookiesMaxAge,
     });
 
     res.status(200).json({

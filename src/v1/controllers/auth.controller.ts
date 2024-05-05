@@ -8,6 +8,7 @@ import User from '../models/user.model';
 import {
   accessTokenExpiresIn,
   accessTokenSecret,
+  cookiesMaxAge,
   env,
   feBaseURL,
   refreshTokenExpiredIn,
@@ -109,7 +110,7 @@ export async function signUpUserHandler(
       httpOnly: true,
       sameSite: 'none',
       secure: env === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: cookiesMaxAge,
     });
 
     res.status(201).json({
@@ -219,7 +220,7 @@ export async function signInUserHandler(
       httpOnly: true,
       sameSite: 'none',
       secure: env === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: cookiesMaxAge,
     });
 
     res.status(200).json({
