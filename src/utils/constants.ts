@@ -48,3 +48,4 @@ export const PROCESSING = 'PROCESSING';
 export const SHIPPING = 'SHIPPING';
 export const SHIPPED = 'SHIPPED';
 export const shippingFlatRate = 15000;
+export const cookiesMaxAge = 1000 * 60 * 60 * 24 * 30; // 30 days
