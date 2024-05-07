@@ -91,7 +91,6 @@ const Product = sequelize.define<IProduct>(
     updatedAt: 'updated_at',
     deletedAt: 'deleted_at',
     underscored: true,
-    paranoid: true,
   }
 );
 

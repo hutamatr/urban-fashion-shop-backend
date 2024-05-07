@@ -4,14 +4,14 @@
   "author": "Hutama Trirahmanto",
   "license": "MIT",
   "description": "Backend for Urban Fashion Shop.",
-  "main": "server.ts",
+  "main": "server.js",
   "engines": {
     "node": ">= 18"
   },
   "scripts": {
     "start": "NODE_ENV=production node build/server.js",
-    "dev": "concurrently \"set NODE_ENV=development\" \"npx tsc --watch\" \"nodemon build/server.js\"",
-    "build": "rm -rf build/ && set NODE_ENV=production && tsc --build",
+    "dev": "concurrently \"NODE_ENV=development npx tsc --watch\" \"NODE_ENV=development nodemon build/server.js\"",
+    "build": "rm -rf build/ && NODE_ENV=production tsc --build",
     "test": "NODE_ENV=test jest --runInBand",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --fix && pnpm format",
