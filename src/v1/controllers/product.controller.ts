@@ -6,6 +6,7 @@ import {
   deleteImageFromStorage,
   imageUpload,
 } from '../../database/firebase.storage';
+import { firebaseStorageFolderEnv } from '../../utils/constants';
 import { CustomError } from '../../utils/custom-error';
 import errorHandler from '../../utils/error-handler';
 
@@ -158,7 +159,10 @@ export async function createProduct(
 
     const discountedPrice = price - price * (discountPercentage / 100);
 
-    const { downloadURL } = await imageUpload(file, 'products/');
+    const { downloadURL } = await imageUpload(
+      file,
+      firebaseStorageFolderEnv() as string
+    );
 
     const createdProduct = await Product.create({
       title,
@@ -233,7 +237,10 @@ export async function updateProduct(
         stock_quantity: stockQuantity,
       });
     } else {
-      const { downloadURL } = await imageUpload(file, 'products/');
+      const { downloadURL } = await imageUpload(
+        file,
+        firebaseStorageFolderEnv() as string
+      );
 
       product.set({
         title,
@@ -286,7 +293,7 @@ export async function deleteProduct(
 
     await deleteImageFromStorage(
       product?.dataValues.image_url as string,
-      'products/'
+      firebaseStorageFolderEnv() as string
     );
 
     const deletedProduct = await Product.destroy({ where: { id: productId } });

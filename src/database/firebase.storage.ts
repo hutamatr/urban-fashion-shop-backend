@@ -7,6 +7,7 @@ import {
 global.XMLHttpRequest = require('xhr2');
 
 import { storage } from './firebase.config';
+import { env } from '../utils/constants';
 
 export async function imageUpload(file: Express.Multer.File, url: string) {
   const storageRef = ref(storage, url);
@@ -34,7 +35,14 @@ export async function deleteImageFromStorage(imageURL: string, url: string) {
     : null;
 
   // Remove "products/products/" from the filename
-  const finalFilename = decodedFilename?.replace(/^products\//, '');
+  const finalFilename = decodedFilename?.replace(
+    env === 'development'
+      ? /^products-dev\//
+      : env === 'test'
+        ? /^products-test\//
+        : /^products\//,
+    ''
+  );
 
   const storageRef = ref(storage, url);
   const imageRef = ref(storageRef, finalFilename);

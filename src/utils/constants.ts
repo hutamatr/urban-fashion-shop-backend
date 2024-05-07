@@ -36,6 +36,11 @@ export const firebaseMessagingSenderId =
   process.env.FIREBASE_MESSAGING_SENDER_ID;
 export const firebaseAppId = process.env.FIREBASE_APP_ID;
 export const firebaseMeasurementId = process.env.FIREBASE_MEASUREMENT_ID;
+export const firebaseStorageFolderTest =
+  process.env.FIREBASE_STORAGE_FOLDER_TEST;
+export const firebaseStorageFolderDev = process.env.FIREBASE_STORAGE_FOLDER_DEV;
+export const firebaseStorageFolderProd =
+  process.env.FIREBASE_STORAGE_FOLDER_PROD;
 
 export const midtransAppURL = process.env.MIDTRANS_APP_URL;
 export const midtransApiURL = process.env.MIDTRANS_API_URL;
@@ -49,3 +54,14 @@ export const SHIPPING = 'SHIPPING';
 export const SHIPPED = 'SHIPPED';
 export const shippingFlatRate = 15000;
 export const cookiesMaxAge = 1000 * 60 * 60 * 24 * 30; // 30 days
+
+export function firebaseStorageFolderEnv(): string | undefined {
+  switch (env) {
+    case 'development':
+      return firebaseStorageFolderDev;
+    case 'test':
+      return firebaseStorageFolderTest;
+    case 'production':
+      return firebaseStorageFolderProd;
+  }
+}
