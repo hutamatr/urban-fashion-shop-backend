@@ -93,10 +93,18 @@ export async function signUpAdminHandler(
       refreshTokenExpiredIn
     );
 
-    await RefreshToken.create({
+    const createdRefreshToken = await RefreshToken.create({
       refresh_token: refreshToken,
       user_id: id,
     });
+
+    if (!createdRefreshToken) {
+      const error = new CustomError(
+        422,
+        'Failed to create refresh token, try again later!'
+      );
+      throw error;
+    }
 
     res.cookie('rt', refreshToken, {
       httpOnly: true,
@@ -146,7 +154,17 @@ export async function signInAdminHandler(
 
     const getRoles = await Role.findOne({ where: { role_name: 'admin' } });
 
-    const adminRoleId = getRoles?.dataValues.id;
+    if (!getRoles) {
+      const error = new CustomError(401, 'Admin role not found!');
+      throw error;
+    }
+
+    if (!email || !password) {
+      const error = new CustomError(401, 'Please provide email and password!');
+      throw error;
+    }
+
+    const adminRoleId = getRoles.dataValues.id;
 
     const admin = await User.findOne({
       where: { email, role_id: adminRoleId },
@@ -213,10 +231,18 @@ export async function signInAdminHandler(
       });
     }
 
-    await RefreshToken.create({
+    const createdRefreshToken = await RefreshToken.create({
       refresh_token: newRefreshToken,
       user_id: id,
     });
+
+    if (!createdRefreshToken) {
+      const error = new CustomError(
+        422,
+        'Failed to create refresh token for admin!'
+      );
+      throw error;
+    }
 
     res.cookie('rt', newRefreshToken, {
       httpOnly: true,

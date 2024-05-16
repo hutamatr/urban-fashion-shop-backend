@@ -6,7 +6,7 @@ import {
   deleteTransactionFromDB,
   getAllTransactionByUser,
   getTransactionById,
-  getTransactions,
+  getTransactionsByStatus,
   transactionNotification,
   updateTransactionStatus,
 } from '../controllers/transaction.controller';
@@ -14,7 +14,7 @@ import { authMiddleware } from '../../middleware/auth';
 
 const router = Router();
 
-router.get('/:status', authMiddleware, getTransactions);
+router.get('/', authMiddleware, getTransactionsByStatus);
 router.get('/user', authMiddleware, getAllTransactionByUser);
 router.get('/:transactionId', authMiddleware, getTransactionById);
 router.post('/', authMiddleware, createTransaction);
