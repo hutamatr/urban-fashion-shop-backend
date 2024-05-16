@@ -62,7 +62,7 @@ describe('Transaction Test Cases', () => {
       .get(`${domain}/transactions/user`)
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
-      .auth(adminToken, { type: 'bearer' });
+      .auth(userToken, { type: 'bearer' });
     expect(res.statusCode).toBe(200);
   });
 
@@ -71,13 +71,13 @@ describe('Transaction Test Cases', () => {
       .get(`${domain}/transactions/${transactionId}`)
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
-      .auth(adminToken, { type: 'bearer' });
+      .auth(userToken, { type: 'bearer' });
     expect(res.statusCode).toBe(200);
   });
 
   test('should return 200 status code when get all transactions by status', async () => {
     const res = await request(app)
-      .get(`${domain}/transactions/${PENDING_PAYMENT}`)
+      .get(`${domain}/transactions?status=${PENDING_PAYMENT}`)
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
       .auth(adminToken, { type: 'bearer' });

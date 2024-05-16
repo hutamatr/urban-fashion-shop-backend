@@ -14,7 +14,6 @@ import { sequelize } from '../../../database/db';
 
 let adminToken;
 let userToken;
-let userId;
 let categoryId;
 let productId;
 let stockQuantity;
@@ -28,7 +27,6 @@ describe('Cart Test Cases', () => {
 
     const createUserAcc = await userRes();
     userToken = createUserAcc.body?.access_token;
-    userId = createUserAcc.body?.user?.id;
 
     const createCategory = await categoryRes(adminToken);
     categoryId = createCategory.body?.category?.id;
@@ -53,7 +51,7 @@ describe('Cart Test Cases', () => {
 
   test('should return 200 status code when get all carts by user', async () => {
     const res = await request(app)
-      .get(`${domain}/carts/${userId}`)
+      .get(`${domain}/carts`)
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
       .auth(userToken, { type: 'bearer' });
