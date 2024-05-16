@@ -3,7 +3,7 @@ import { Router } from 'express';
 import {
   createCart,
   deleteCart,
-  getCartByUser,
+  getCartsByUser,
   updateCart,
 } from '../controllers/cart.controller';
 import { authMiddleware } from '../../middleware/auth';
@@ -12,7 +12,7 @@ import { cartValidation } from '../../validations/cart.validation';
 
 const router = Router();
 
-router.get('/:userId', authMiddleware, getCartByUser);
+router.get('/', authMiddleware, getCartsByUser);
 
 router.post('/', authMiddleware, validate(cartValidation), createCart);
 

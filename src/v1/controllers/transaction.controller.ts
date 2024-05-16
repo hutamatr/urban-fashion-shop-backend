@@ -305,17 +305,21 @@ export async function createTransaction(
  * next middleware function in the request-response cycle. It is typically used to handle errors or to
  * move on to the next middleware function after completing the current one.
  */
-export async function getTransactions(
+export async function getTransactionsByStatus(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const statusTransaction = req.params.status;
+    let statusTransaction = req.query.status as string;
     const isAdmin = req.isAdmin;
 
+    if (!statusTransaction) {
+      statusTransaction = 'PENDING_PAYMENT';
+    }
+
     if (!isAdmin) {
-      const error = new CustomError(401, 'Not authorized!');
+      const error = new CustomError(401, 'Not Authorized!');
       throw error;
     }
 
@@ -350,14 +354,22 @@ export async function getAllTransactionByUser(
   try {
     const userId = req.userId;
 
+    if (!userId) {
+      const error = new CustomError(401, 'Not Authenticated!');
+      throw error;
+    }
+
     const transaction = await Transaction.findAll({
       where: { user_id: userId },
       order: [['created_at', 'DESC']],
     });
 
     if (transaction.length === 0) {
-      const error = new CustomError(404, 'Transaction not found!');
-      throw error;
+      res.status(200).json({
+        status: 'success',
+        message: 'Transaction empty',
+        transaction: [],
+      });
     }
 
     res.status(200).json({

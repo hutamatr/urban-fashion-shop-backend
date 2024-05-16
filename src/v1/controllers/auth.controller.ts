@@ -152,15 +152,16 @@ export async function signInUserHandler(
     const email = req.body.email;
     const password = req.body.password;
 
-    const getRole = await Role.findOne({ where: { role_name: 'user' } });
+    if (!email || !password) {
+      const error = new CustomError(400, 'Please provide email and password!');
+      throw error;
+    }
 
-    const roleId = getRole?.dataValues?.id;
-
-    const user = await User.findOne({ where: { email, role_id: roleId } });
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
       const error = new CustomError(
-        401,
+        404,
         'User with this email could not be found!'
       );
       throw error;
@@ -172,7 +173,7 @@ export async function signInUserHandler(
     );
 
     if (!verifyPassword) {
-      const error = new CustomError(401, 'Incorrect Password!');
+      const error = new CustomError(400, 'Incorrect Password!');
       throw error;
     }
 

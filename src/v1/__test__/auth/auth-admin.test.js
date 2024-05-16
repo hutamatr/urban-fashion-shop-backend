@@ -17,7 +17,7 @@ describe('Auth Admin Test Cases', () => {
     await sequelize.sync({ force: true });
   });
 
-  test('should return 201 status code when signup admin with valid credentials', async () => {
+  test('should return 201 status code when signup admin with valid account', async () => {
     const res = await request(app)
       .post(`${domain}/admin/signup`)
       .send({
@@ -32,7 +32,7 @@ describe('Auth Admin Test Cases', () => {
     expect(res.body.access_token).not.toBeNull();
   });
 
-  test('should return 200 status code when signin admin with valid credentials', async () => {
+  test('should return 200 status code when signin admin with valid account', async () => {
     const res = await request(app)
       .post(`${domain}/admin/signin`)
       .send({

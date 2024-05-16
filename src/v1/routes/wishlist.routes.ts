@@ -10,7 +10,7 @@ import { authMiddleware } from '../../middleware/auth';
 
 const router = Router();
 
-router.get('/:userId', authMiddleware, getWishlistsByUser);
+router.get('/', authMiddleware, getWishlistsByUser);
 
 router.get('/:productId', authMiddleware, getWishlist);
 

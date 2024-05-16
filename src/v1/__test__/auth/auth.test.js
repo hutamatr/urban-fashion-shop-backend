@@ -9,6 +9,7 @@ const domain = '/api/v1';
 const email = faker.internet.email();
 const password = 'Rahmanto123!';
 const confirmPassword = password;
+const newPassword = 'newPassword123!';
 let token;
 let userId;
 let resetPasswordToken;
@@ -40,7 +41,7 @@ describe('Auth Test Cases', () => {
       .post(`${domain}/change-password/${userId}`)
       .send({
         current_password: password,
-        new_password: 'newPassword123!',
+        new_password: newPassword,
       })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
@@ -61,7 +62,7 @@ describe('Auth Test Cases', () => {
       .post(`${domain}/signin`)
       .send({
         email: email,
-        password: 'newPassword123!',
+        password: newPassword,
       })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json');
@@ -95,7 +96,7 @@ describe('Auth Test Cases', () => {
     expect(res.statusCode).toBe(403);
   });
 
-  test('should return 401 status code when signin user with wrong password', async () => {
+  test('should return 400 status code when signin user with wrong password', async () => {
     const res = await request(app)
       .post(`${domain}/signin`)
       .send({
@@ -104,7 +105,7 @@ describe('Auth Test Cases', () => {
       })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json');
-    expect(res.statusCode).toBe(401);
+    expect(res.statusCode).toBe(400);
   });
 
   test('should return 200 status code when reset password link sent successfully', async () => {
