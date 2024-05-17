@@ -271,8 +271,8 @@ export async function createTransaction(
       status: 'success',
       message: 'Transaction created successfully',
       transaction: {
-        id: transaction_id,
-        status: PENDING_PAYMENT,
+        id: transaction.id,
+        status: transaction.status,
         first_name: firstName,
         last_name: lastName,
         email: user.email,
@@ -280,6 +280,7 @@ export async function createTransaction(
         snap_token: data.token,
         snap_redirect_url: data.redirect_url,
         payment_method: transaction.payment_method,
+        shipping_status: transaction.shipping_status,
         created_at: transaction.created_at,
       },
     });
@@ -409,7 +410,7 @@ export async function getTransactionById(
       include: [
         {
           model: User,
-          attributes: ['id', 'first_name', 'last_name', 'email'],
+          attributes: ['id', 'first_name', 'last_name', 'email', 'address'],
         },
         {
           model: Product,
@@ -443,9 +444,11 @@ export async function getTransactionById(
         first_name: transaction.user?.first_name,
         last_name: transaction.user?.last_name,
         email: transaction.user?.email,
+        address: transaction.user?.address,
         snap_token: transaction.snap_token,
         snap_redirect_url: transaction.snap_redirect_url,
         payment_method: transaction.payment_method,
+        shipping_status: transaction.shipping_status,
         products: transaction.products,
         created_at: transaction.created_at,
       },
@@ -662,30 +665,6 @@ export async function cancelTransaction(
     const authString = btoa(`${midtransServerKey}:`);
     const t = await sequelizeTransaction();
 
-    const response = await fetch(
-      `${midtransApiURL}/v2/${transactionId}/cancel`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-          Authorization: `Basic ${authString}`,
-        },
-      }
-    );
-
-    if (response.status !== 200) {
-      const error = new CustomError(response.status, await response.text());
-      throw error;
-    }
-
-    const data = await response.json();
-
-    if (parseInt(data?.status_code) >= 400) {
-      const error = new CustomError(data.status_code, data.status_message);
-      throw error;
-    }
-
     const transaction = await Transaction.findOne({
       where: { id: transactionId },
       transaction: t,
@@ -700,11 +679,36 @@ export async function cancelTransaction(
 
     await transaction.save({ transaction: t });
 
-    await t.commit();
+    t.commit().then(async () => {
+      await fetch(`${midtransApiURL}/v2/${transactionId}/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Basic ${authString}`,
+        },
+      });
+
+      // if (response.status !== 200) {
+      //   const error = new CustomError(response.status, await response.text());
+      //   throw error;
+      // }
+
+      // const data = await response.json();
+
+      // if (parseInt(data?.status_code) >= 400) {
+      //   const error = new CustomError(data.status_code, data.status_message);
+      //   throw error;
+      // }
+    });
 
     res.status(200).json({
       status: 'success',
       message: 'Transaction canceled successfully',
+      transaction: {
+        id: transaction.id,
+        status: transaction.status,
+      },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

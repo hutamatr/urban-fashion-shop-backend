@@ -53,7 +53,7 @@ const Transaction = sequelize.define<ITransaction>(
       allowNull: false,
     },
     shipping_status: {
-      type: DataTypes.ENUM('PROCESSING', 'SHIPPING', 'SHIPPED'),
+      type: DataTypes.ENUM('PROCESSING', 'SHIPPING', 'DELIVERED'),
       allowNull: false,
     },
     snap_token: {
